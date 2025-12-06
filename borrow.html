@@ -39,7 +39,8 @@ body {
 .item {
   width: 120px;
   margin: 10px;
-  cursor: grab;
+  cursor: pointer;
+  border-radius: 10px;
 }
 </style>
 </head>
@@ -50,31 +51,27 @@ body {
 
 <div id="machine">
 
-  <!-- ✅ 刷卡區 -->
-  <div class="area" id="cardArea">
+  <div class="area">
     <h3>刷卡區</h3>
-    <p>請放入學生證</p>
+    <p>請點擊學生證</p>
   </div>
 
-  <!-- ✅ 掃描區（下一關才用） -->
-  <div class="area" id="bookArea">
+  <div class="area">
     <h3>掃描區</h3>
-    <p>請放入書籍</p>
+    <p>請點擊書籍</p>
   </div>
 
   <div>
-    <!-- ✅ 學生證 -->
-    <img id="card" class="item" draggable="true"
+    <img id="card" class="item"
          src="https://i.imgur.com/9z3sKQy.png">
-    <p>學生證</p>
+    <p>學生證（點我）</p>
 
-    <!-- ✅ 書本（暫時先不動） -->
-    <img id="book" class="item" draggable="true"
+    <img id="book" class="item"
          src="https://i.imgur.com/Y4z9FZg.png">
-    <p>書本</p>
+    <p>書本（點我）</p>
   </div>
 
-  <div id="msg">請先刷學生證</div>
+  <div id="msg">請先點擊學生證完成刷卡</div>
 
 </div>
 
@@ -82,29 +79,24 @@ body {
 let cardOK = false;
 
 const card = document.getElementById("card");
-const cardArea = document.getElementById("cardArea");
+const book = document.getElementById("book");
 const msg = document.getElementById("msg");
 
-/* ✅ 拖學生證開始 */
-card.addEventListener("dragstart", function(e) {
-  e.dataTransfer.setData("text", "card");
-});
-
-/* ✅ 允許刷卡區可以被放 */
-cardArea.addEventListener("dragover", function(e) {
-  e.preventDefault();
-});
-
-/* ✅ 當學生證放進刷卡區 */
-cardArea.addEventListener("drop", function(e) {
-  e.preventDefault();
-
+/* ✅ 點擊學生證 = 刷卡成功 */
+card.onclick = function() {
   cardOK = true;
-  msg.innerText = "✅ 刷卡成功！請再掃描書籍";
-});
+  msg.innerText = "✅ 刷卡成功！請再點擊書籍掃描";
+};
+
+/* ✅ 點擊書本 = 判斷是否已刷卡 */
+book.onclick = function() {
+  if(cardOK) {
+    msg.innerText = "🎉 借書成功！請記得 14 天內歸還";
+  } else {
+    msg.innerText = "❌ 請先刷學生證再借書！";
+  }
+};
 </script>
 
 </body>
 </html>
-
-
