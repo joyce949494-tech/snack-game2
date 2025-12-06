@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>借還書流程挑戰</title>
+
+<style>
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: #e6f2ff;
+  text-align: center;
+  padding: 20px;
+}
+
+#machine {
+  width: 360px;
+  margin: auto;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+.area {
+  border: 3px dashed #999;
+  border-radius: 12px;
+  margin: 15px;
+  padding: 15px;
+}
+
+#msg {
+  font-size: 18px;
+  height: 40px;
+  margin-top: 10px;
+  color: #333;
+}
+
+.item {
+  width: 120px;
+  margin: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📘 借還書流程挑戰</h2>
+
+<div id="machine">
+
+  <div class="area">
+    <h3>刷卡區</h3>
+    <p>請放入學生證</p>
+  </div>
+
+  <div class="area">
+    <h3>掃描區</h3>
+    <p>請放入書籍</p>
+  </div>
+
+  <div>
+    <img class="item" src="https://i.imgur.com/9z3sKQy.png">
+    <p>學生證</p>
+
+    <img class="item" src="https://i.imgur.com/Y4z9FZg.png">
+    <p>書本</p>
+  </div>
+
+  <div id="msg">請先刷學生證</div>
+
+</div>
+
+</body>
+</html>
