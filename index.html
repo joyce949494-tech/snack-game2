@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>圖書館輕食區挑戰</title>
+<style>
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: #f6f1e7;
+  text-align: center;
+  padding: 20px;
+}
+#gameBox {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 360px;
+  margin: auto;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+img {
+  width: 200px;
+  margin: 10px 0;
+}
+button {
+  font-size: 16px;
+  padding: 10px 20px;
+  margin: 8px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+.allow { background: #4caf50; color: white; }
+.no { background: #f44336; color: white; }
+#msg { font-size: 18px; margin-top: 10px; min-height: 40px; }
+</style>
+</head>
+
+<body>
+
+<div id="gameBox">
+  <h2>☕ 輕食區挑戰</h2>
+  <p>請判斷這個食物能不能帶進圖書館：</p>
+
+  <img id="foodImg" src="https://i.imgur.com/9z3sKQy.png">
+  <h3 id="foodName">飲料</h3>
+
+  <div>
+    <button class="allow" onclick="check('yes')">可帶入</button>
+    <button class="no" onclick="check('no')">不可帶入</button>
+  </div>
+
+  <div id="msg"></div>
+  <div id="score">目前得分：0</div>
+</div>
+
+<script>
+const foods = [
+  {name:"飲料", img:"https://i.imgur.com/9z3sKQy.png", ans:"yes", tip:"✅ 瓶裝飲料可以帶入，記得蓋好蓋子！"},
+  {name:"三明治", img:"https://i.imgur.com/Y4z9FZg.png", ans:"yes", tip:"✅ 氣味低的小點心是可以的！"},
+  {name:"火鍋", img:"https://i.imgur.com/jSTHj6k.png", ans:"no", tip:"❌ 火鍋味道太重，禁止！"},
+  {name:"炸雞", img:"https://i.imgur.com/Y7zF2Mb.png", ans:"no", tip:"❌ 炸雞氣味強烈，不適合！"}
+];
+
+let i = 0;
+let score = 0;
+
+function showFood() {
+  document.getElementById("foodName").innerText = foods[i].name;
+  document.getElementById("foodImg").src = foods[i].img;
+  document.getElementById("msg").innerText = "";
+  document.getElementById("score").innerText = "目前得分：" + score;
+}
+
+function check(ans) {
+  if(ans === foods[i].ans) {
+    score++;
+    document.getElementById("msg").innerText = "香氣精靈說：" + foods[i].tip;
+  } else {
+    document.getElementById("msg").innerText = "香氣精靈說：" + foods[i].tip;
+  }
+
+  setTimeout(() => {
+    i++;
+    if(i < foods.length) {
+      showFood();
+    } else {
+      document.getElementById("gameBox").innerHTML =
+        "<h2>🎉 挑戰完成！</h2><p>你的得分：" + score + " / " + foods.length + "</p><p>你已通過輕食區試煉！</p>";
+    }
+  }, 1500);
+}
+
+showFood();
+</script>
+
+</body>
+</html>
