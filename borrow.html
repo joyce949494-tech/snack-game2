@@ -17,35 +17,58 @@ body {
   margin: auto;
   background: white;
   border-radius: 20px;
-  padding: 20px;
+  padding: 15px;
   box-shadow: 0 0 15px rgba(0,0,0,0.3);
 }
 
-.area {
+/* ===== 上方區塊：螢幕 + 刷卡區 ===== */
+#topArea {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ✅ 螢幕 */
+#machineScreen {
+  width: 220px;
+  border-radius: 12px;
+  border: 3px solid #ccc;
+}
+
+/* ✅ 刷卡區（在右側） */
+#cardArea {
+  width: 110px;
+  height: 160px;
+  margin-left: 10px;
+  border-radius: 12px;
+  border: 3px dashed #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f7f7;
+}
+
+#cardArea img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* ===== 借書區（下方） ===== */
+#bookArea {
+  margin-top: 15px;
   border: 3px dashed #999;
   border-radius: 12px;
-  margin: 15px;
-  padding: 15px;
-  min-height: 90px;
+  padding: 10px;
 }
 
-#cardArea.active {
-  border-color: #4caf50;
+#bookArea img {
+  width: 90%;
+  border-radius: 12px;
 }
 
-#bookArea.active {
-  border-color: #2196f3;
-}
-
-#msg {
-  font-size: 18px;
-  height: 40px;
-  margin-top: 10px;
-  color: #333;
-}
-
+/* ✅ 拖曳物品 */
 .item {
-  width: 120px;
+  width: 90px;
   margin: 10px;
   cursor: grab;
 }
@@ -58,27 +81,35 @@ body {
 
 <div id="machine">
 
-  <div class="area" id="cardArea">
-    <h3>刷卡區</h3>
-    <p>請拖動學生證到這裡</p>
+  <!-- ✅ 上方：螢幕 + 刷卡區 -->
+  <div id="topArea">
+
+    <!-- ✅ 螢幕（會換圖） -->
+    <img id="machineScreen"
+         src="https://i.imgur.com/0PSwfBX.png">
+
+    <!-- ✅ 刷卡區（實際照片） -->
+    <div id="cardArea">
+      <img src="https://i.imgur.com/C6TOz7M.jpeg">
+    </div>
+
   </div>
 
-  <div class="area" id="bookArea">
-    <h3>掃描區</h3>
-    <p>請拖動書籍到這裡</p>
+  <!-- ✅ 下方：借書區（實際照片） -->
+  <div id="bookArea">
+    <img src="https://i.imgur.com/LtJL7i9.jpeg">
   </div>
 
+  <!-- ✅ 可拖曳物件 -->
   <div>
     <img id="card" class="item" draggable="true"
-         src="https://i.imgur.com/9z3sKQy.png">
+         src="https://i.imgur.com/2576otq.png">
     <p>學生證</p>
 
     <img id="book" class="item" draggable="true"
-         src="https://i.imgur.com/Y4z9FZg.png">
+         src="https://i.imgur.com/3NN0HWR.jpeg">
     <p>書本</p>
   </div>
-
-  <div id="msg">請先拖學生證完成刷卡</div>
 
 </div>
 
@@ -87,45 +118,48 @@ let cardOK = false;
 
 const card = document.getElementById("card");
 const book = document.getElementById("book");
+
 const cardArea = document.getElementById("cardArea");
 const bookArea = document.getElementById("bookArea");
-const msg = document.getElementById("msg");
 
-/* ✅ 拖學生證開始 */
+const machineScreen = document.getElementById("machineScreen");
+
+/* ========= 拖學生證 ========= */
 card.addEventListener("dragstart", function(e) {
   e.dataTransfer.setData("type", "card");
 });
 
-/* ✅ 刷卡區允許放置 */
+/* 允許刷卡區放置 */
 cardArea.addEventListener("dragover", function(e) {
   e.preventDefault();
 });
 
+/* 放入刷卡區 → 換螢幕圖片 */
 cardArea.addEventListener("drop", function(e) {
   e.preventDefault();
   cardOK = true;
-  cardArea.classList.add("active");
-  msg.innerText = "✅ 刷卡成功！請再拖書籍到掃描區";
+
+  // ✅ 換成「刷卡成功畫面」
+  machineScreen.src = "https://i.imgur.com/vZmbejl.png";
 });
 
-/* ✅ 拖書開始 */
+/* ========= 拖書 ========= */
 book.addEventListener("dragstart", function(e) {
   e.dataTransfer.setData("type", "book");
 });
 
-/* ✅ 掃描區允許放置 */
+/* 允許借書區放置 */
 bookArea.addEventListener("dragover", function(e) {
   e.preventDefault();
 });
 
+/* 放入借書區 → 如果已刷卡就成功 */
 bookArea.addEventListener("drop", function(e) {
   e.preventDefault();
 
   if (cardOK) {
-    bookArea.classList.add("active");
-    msg.innerText = "🎉 借書成功！請於 14 天內歸還";
-  } else {
-    msg.innerText = "❌ 請先刷學生證再借書！";
+    // ✅ 換成「借書完成畫面」
+    machineScreen.src = "https://i.imgur.com/fWWUr0R.png";
   }
 });
 </script>
