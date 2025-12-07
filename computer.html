@@ -28,7 +28,13 @@ button {
   border-radius: 10px;
   border: none;
   cursor: pointer;
+  color: white;
 }
+
+.main { background: #1976d2; }   /* 藍 */
+.sub  { background: #7b1fa2; }   /* 紫 */
+.warn { background: #f57c00; }   /* 橘 */
+.dark { background: #424242; }   /* 深灰 */
 
 .ok { background: #4caf50; color: white; }
 .no { background: #f44336; color: white; }
@@ -49,9 +55,9 @@ button {
 
   <p>你來到圖書館的電腦區，準備使用電腦。</p>
 
-  <button class="no" onclick="wrong()">直接坐下開始用</button>
-  <button class="no" onclick="wrong()">借同學的帳號使用</button>
-  <button class="ok" onclick="correct()">到櫃檯登記借用</button>
+  <button class="dark" onclick="wrong()">直接坐下開始用</button>
+  <button class="dark" onclick="wrong()">借同學的帳號使用</button>
+  <button class="main" onclick="correct()">到櫃檯登記借用</button>
 
   <div id="msg"></div>
 </div>
