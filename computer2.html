@@ -2,50 +2,58 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<title>電腦區模擬任務 - 找電源鍵</title>
+<title>電腦區第二關｜尋找電源鍵</title>
+
 <style>
 body {
   font-family: "Microsoft JhengHei", sans-serif;
-  background: #eaf0f6;
+  background: #eef3f8;
   text-align: center;
   padding: 20px;
 }
 
 #gameBox {
   background: white;
-  max-width: 480px;
-  margin: auto;
-  border-radius: 20px;
+  border-radius: 18px;
   padding: 20px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.2);
-}
-
-#screenBox {
+  max-width: 420px;
+  margin: auto;
+  box-shadow: 0 0 12px rgba(0,0,0,.2);
   position: relative;
-  margin: 20px auto;
-  width: 320px;
 }
 
 #screenImg {
   width: 100%;
-  border-radius: 10px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
 }
 
-#hotspot {
+/* ✅ 右中方探索區（透明） */
+#searchZone {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
-  width: 40px;
-  height: 40px;
-  border: 2px dashed red;
+  width: 90px;
+  height: 80px;
+  right: 20px;
+  top: 170px;
   cursor: pointer;
-  display: none; /* 之後你也可以開啟顯示方便測試 */
+}
+
+/* ✅ 側面電源鍵感應區 */
+#powerZone {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  right: 60px;
+  top: 210px;
+  cursor: pointer;
+  display: none;
 }
 
 #msg {
+  margin-top: 14px;
   font-size: 18px;
-  min-height: 40px;
-  margin-top: 15px;
+  min-height: 32px;
 }
 </style>
 </head>
@@ -53,36 +61,45 @@ body {
 <body>
 
 <div id="gameBox">
-  <h2>💻 第二關：開機</h2>
-  <p>請在下圖中找出「螢幕右後方」的電源鍵，點擊它開機。</p>
 
-  <div id="screenBox">
-    <img id="screenImg" src="">
-    <div id="hotspot" onclick="powerOn()"></div>
-  </div>
+  <h2>💻 第二關：找到電源鍵</h2>
+  <p>精靈給的提示：「開關在螢幕右後方喔！」</p>
+
+  <!-- ✅ 圖片 -->
+  <img id="screenImg" src="front.jpg網址">
+
+  <!-- ✅ 隱藏探索區 -->
+  <div id="searchZone" onclick="showSide()"></div>
+
+  <!-- ✅ 電源鍵點擊區 -->
+  <div id="powerZone" onclick="powerOn()"></div>
 
   <div id="msg"></div>
+
 </div>
 
 <script>
-const img = document.getElementById("screenImg");
-img.src = "https://i.imgur.com/nhyLpmL.png"; 
-// ✅ 請改成你自己的螢幕照片網址！！！
+let step = 1;
 
-const hotspot = document.getElementById("hotspot");
-hotspot.style.display = "block"; // 測試階段先顯示紅框
+function showSide() {
+  if (step !== 1) return;
 
-img.onclick = function() {
-  document.getElementById("msg").innerText =
-    "❌ 這裡不是電源鍵的位置，再仔細找找看右後方！";
-};
+  document.getElementById("screenImg").src = "side.jpg網址";
+  document.getElementById("msg").innerText = "✅ 你找到了電腦側面！現在按下電源鍵吧！";
+
+  document.getElementById("searchZone").style.display = "none";
+  document.getElementById("powerZone").style.display = "block";
+
+  step = 2;
+}
 
 function powerOn() {
-  document.getElementById("msg").innerText =
-    "✅ 找到了！電腦開機中...";
+  if (step !== 2) return;
 
+  document.getElementById("msg").innerText = "✅ 電腦開機中...";
+  
   setTimeout(() => {
-    window.location.href = "computer3.html";  // ✅ 串到第三關
+    window.location.href = "computer3.html";
   }, 1200);
 }
 </script>
