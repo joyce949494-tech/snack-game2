@@ -28,11 +28,13 @@ body {
   border-radius: 10px;
   border: none;
   cursor: pointer;
+  color: white;
 }
 
-.ok { background: #4caf50; color: white; }
-.warn { background: #ff9800; color: white; }
-.no { background: #f44336; color: white; }
+.study { background: #1976d2; }   /* 藍 */
+.print { background: #388e3c; }   /* 綠藍 */
+.video { background: #f57c00; }   /* 橘 */
+.game  { background: #424242; }   /* 深灰 */
 
 #timeBox {
   font-size: 20px;
@@ -57,10 +59,11 @@ body {
 
   <p>請選擇你要進行的行為：</p>
 
-  <button class="ok action-btn" onclick="doAction('study')">查資料 / 打報告（30 分）</button>
-  <button class="ok action-btn" onclick="doAction('print')">連接印表機列印（10 分）</button>
-  <button class="warn action-btn" onclick="doAction('video')">看影片（30 分）</button>
-  <button class="no action-btn" onclick="doAction('game')">打遊戲（違規）</button>
+<button class="study action-btn" onclick="doAction('study')">查資料 / 打報告（30 分）</button>
+<button class="print action-btn" onclick="doAction('print')">連接印表機列印（10 分）</button>
+<button class="video action-btn" onclick="doAction('video')">看影片（30 分）</button>
+<button class="game action-btn" onclick="doAction('game')">打遊戲（違規）</button>
+
 
   <div id="msg"></div>
 </div>
