@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>電腦區模擬任務 - 借用登記</title>
+<style>
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: #eef2f7;
+  text-align: center;
+  padding: 30px;
+}
+
+#gameBox {
+  background: white;
+  max-width: 420px;
+  margin: auto;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+button {
+  width: 90%;
+  font-size: 18px;
+  padding: 12px;
+  margin: 10px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.ok { background: #4caf50; color: white; }
+.no { background: #f44336; color: white; }
+
+#msg {
+  margin-top: 20px;
+  font-size: 18px;
+  min-height: 40px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="gameBox">
+  <h2>💻 電腦區模擬任務</h2>
+  <h3>第一關：使用前你會怎麼做？</h3>
+
+  <p>你來到圖書館的電腦區，準備使用電腦。</p>
+
+  <button class="no" onclick="wrong()">直接坐下開始用</button>
+  <button class="no" onclick="wrong()">借同學的帳號使用</button>
+  <button class="ok" onclick="correct()">到櫃檯登記借用</button>
+
+  <div id="msg"></div>
+</div>
+
+<script>
+function wrong() {
+  document.getElementById("msg").innerText =
+    "❌ 這樣是違規的！使用電腦前必須先登記借用。";
+}
+
+function correct() {
+  document.getElementById("msg").innerText =
+    "✅ 登記成功！你獲得 2 小時的使用時間，準備開機吧！";
+
+  setTimeout(() => {
+    // 之後這裡會跳到「第二關：找電源鍵」
+    alert("即將進入下一關：找電源鍵（下一步我會幫你做）");
+  }, 1200);
+}
+</script>
+
+</body>
+</html>
