@@ -28,11 +28,13 @@ button {
   border-radius: 10px;
   border: none;
   cursor: pointer;
+  color: white;
 }
 
-.ok { background: #4caf50; color: white; }
-.warn { background: #ff9800; color: white; }
-.no { background: #f44336; color: white; }
+.main { background: #1976d2; }   /* 藍 */
+.sub  { background: #7b1fa2; }   /* 紫 */
+.warn { background: #f57c00; }   /* 橘 */
+.dark { background: #424242; }   /* 深灰 */
 
 #msg {
   margin-top: 20px;
@@ -49,9 +51,10 @@ button {
 
   <p id="queueText"></p>
 
-  <button class="ok" onclick="renew()">申請續借</button>
-  <button class="warn" onclick="logout()">正常登出離開</button>
-  <button class="no" onclick="cheat()">偷偷繼續用</button>
+  <button class="main" onclick="renew()">申請續借</button>
+  <button class="sub" onclick="logout()">正常登出離開</button>
+  <button class="dark" onclick="cheat()">偷偷繼續用</button>
+
 
   <div id="msg"></div>
 </div>
