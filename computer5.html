@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>電腦區模擬任務 - 完成</title>
+<style>
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: #e8f5e9;
+  text-align: center;
+  padding: 30px;
+}
+
+#gameBox {
+  background: white;
+  max-width: 480px;
+  margin: auto;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+button {
+  margin-top: 15px;
+  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="gameBox">
+  <h2>🎉 電腦區任務完成！</h2>
+
+  <p>你已完成以下事項：</p>
+
+  <ul style="text-align:left; max-width:300px; margin:auto;">
+    <li>✅ 正確登記借用</li>
+    <li>✅ 成功找到電源鍵</li>
+    <li>✅ 合理使用電腦</li>
+    <li>✅ 正確處理使用時間</li>
+    <li>✅ 完成列印與登出</li>
+  </ul>
+
+  <p style="margin-top:15px;">你已通過「電腦區守則試煉」！</p>
+
+  <button onclick="backToMain()">回主選單</button>
+</div>
+
+<script>
+function backToMain() {
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
