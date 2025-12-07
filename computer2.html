@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<title>電腦區第二關｜尋找電源鍵</title>
+<title>電腦區第二關｜找電源鍵</title>
 
 <style>
 body {
@@ -26,26 +26,27 @@ body {
   width: 100%;
   border-radius: 12px;
   margin-bottom: 10px;
-  cursor: pointer;
 }
 
-/* ✅ 右中方探索區（透明） */
-#searchZone {
+/* ✅ 正面圖：右下角紅框 */
+#hintFront {
   position: absolute;
-  width: 90px;
-  height: 80px;
-  right: 20px;
-  top: 170px;
+  width: 110px;
+  height: 60px;
+  right: 30px;
+  top: 250px;
+  border: 3px solid red;
   cursor: pointer;
 }
 
-/* ✅ 側面電源鍵感應區 */
-#powerZone {
+/* ✅ 側面圖：電源鍵紅框 */
+#hintSide {
   position: absolute;
   width: 70px;
   height: 70px;
-  right: 60px;
-  top: 210px;
+  right: 95px;
+  top: 215px;
+  border: 3px solid red;
   cursor: pointer;
   display: none;
 }
@@ -63,41 +64,33 @@ body {
 <div id="gameBox">
 
   <h2>💻 第二關：找到電源鍵</h2>
-  <p>精靈給的提示：「開關在螢幕右後方喔！」</p>
+  <p>提示：電源鍵在「螢幕右後方」</p>
 
-  <!-- ✅ 圖片 -->
+  <!-- ✅ 正面圖 -->
   <img id="screenImg" src="https://i.imgur.com/cJPH0Rf.jpeg">
 
-  <!-- ✅ 隱藏探索區 -->
-  <div id="searchZone" onclick="showSide()"></div>
+  <!-- ✅ 正面紅框 -->
+  <div id="hintFront" onclick="showSide()"></div>
 
-  <!-- ✅ 電源鍵點擊區 -->
-  <div id="powerZone" onclick="powerOn()"></div>
+  <!-- ✅ 側面紅框 -->
+  <div id="hintSide" onclick="powerOn()"></div>
 
   <div id="msg"></div>
 
 </div>
 
 <script>
-let step = 1;
-
 function showSide() {
-  if (step !== 1) return;
-
   document.getElementById("screenImg").src = "https://i.imgur.com/a5WdmbM.jpeg";
-  document.getElementById("msg").innerText = "✅ 你找到了電腦側面！現在按下電源鍵吧！";
+  document.getElementById("msg").innerText = "✅ 找到側面了！請按下電源鍵";
 
-  document.getElementById("searchZone").style.display = "none";
-  document.getElementById("powerZone").style.display = "block";
-
-  step = 2;
+  document.getElementById("hintFront").style.display = "none";
+  document.getElementById("hintSide").style.display = "block";
 }
 
 function powerOn() {
-  if (step !== 2) return;
-
   document.getElementById("msg").innerText = "✅ 電腦開機中...";
-  
+
   setTimeout(() => {
     window.location.href = "computer3.html";
   }, 1200);
