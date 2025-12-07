@@ -67,8 +67,7 @@ function correct() {
     "✅ 登記成功！你獲得 2 小時的使用時間，準備開機吧！";
 
   setTimeout(() => {
-    // 之後這裡會跳到「第二關：找電源鍵」
-    alert("即將進入下一關：找電源鍵（下一步我會幫你做）");
+    window.location.href = "computer2.html";  // ✅ 串到第二關
   }, 1200);
 }
 </script>
