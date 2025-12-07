@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>電腦區模擬任務 - 續借判斷</title>
+<style>
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: #edf2f8;
+  text-align: center;
+  padding: 20px;
+}
+
+#gameBox {
+  background: white;
+  max-width: 480px;
+  margin: auto;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+button {
+  width: 90%;
+  font-size: 18px;
+  padding: 12px;
+  margin: 8px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.ok { background: #4caf50; color: white; }
+.warn { background: #ff9800; color: white; }
+.no { background: #f44336; color: white; }
+
+#msg {
+  margin-top: 20px;
+  font-size: 18px;
+  min-height: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="gameBox">
+  <h2>⏳ 第四關：使用時間已滿</h2>
+
+  <p id="queueText"></p>
+
+  <button class="ok" onclick="renew()">申請續借</button>
+  <button class="warn" onclick="logout()">正常登出離開</button>
+  <button class="no" onclick="cheat()">偷偷繼續用</button>
+
+  <div id="msg"></div>
+</div>
+
+<script>
+const queue = Math.floor(Math.random() * 4); 
+// 0 ~ 3 人排隊
+
+document.getElementById("queueText").innerText =
+  "目前排隊人數：" + queue + " 人";
+
+function renew() {
+  if (queue === 0) {
+    document.getElementById("msg").innerText =
+      "✅ 目前無人排隊，你成功續借 30 分鐘！";
+
+    setTimeout(() => {
+      window.location.href = "computer3.html";
+    }, 1200);
+  } else {
+    document.getElementById("msg").innerText =
+      "❌ 目前有人排隊，你不能續借，請立即登出！";
+  }
+}
+
+function logout() {
+  document.getElementById("msg").innerText =
+    "✅ 你已正常登出，感謝你遵守電腦使用規範！";
+
+  setTimeout(() => {
+    window.location.href = "computer5.html";
+  }, 1200);
+}
+
+function cheat() {
+  document.getElementById("msg").innerText =
+    "❌ 違規行為！你已被系統強制登出並記錄！";
+
+  setTimeout(() => {
+    window.location.href = "computer5.html";
+  }, 1200);
+}
+</script>
+
+</body>
+</html>
