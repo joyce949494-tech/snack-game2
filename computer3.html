@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>電腦區模擬任務 - 使用行為</title>
+<style>
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: #eef3f9;
+  text-align: center;
+  padding: 20px;
+}
+
+#gameBox {
+  background: white;
+  max-width: 480px;
+  margin: auto;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+.action-btn {
+  width: 90%;
+  font-size: 18px;
+  padding: 12px;
+  margin: 8px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.ok { background: #4caf50; color: white; }
+.warn { background: #ff9800; color: white; }
+.no { background: #f44336; color: white; }
+
+#timeBox {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#msg {
+  margin-top: 15px;
+  font-size: 17px;
+  min-height: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="gameBox">
+  <h2>💻 第三關：電腦使用行為</h2>
+
+  <div id="timeBox">剩餘時間：120 分鐘</div>
+
+  <p>請選擇你要進行的行為：</p>
+
+  <button class="ok action-btn" onclick="doAction('study')">查資料 / 打報告（30 分）</button>
+  <button class="ok action-btn" onclick="doAction('print')">連接印表機列印（10 分）</button>
+  <button class="warn action-btn" onclick="doAction('video')">看影片（30 分）</button>
+  <button class="no action-btn" onclick="doAction('game')">打遊戲（違規）</button>
+
+  <div id="msg"></div>
+</div>
+
+<script>
+let timeLeft = 120;
+
+function updateTime() {
+  document.getElementById("timeBox").innerText =
+    "剩餘時間：" + timeLeft + " 分鐘";
+}
+
+function doAction(type) {
+  if (timeLeft <= 0) {
+    endGame();
+    return;
+  }
+
+  if (type === "study") {
+    timeLeft -= 30;
+    document.getElementById("msg").innerText =
+      "✅ 你正在查資料與完成報告，合理使用電腦中。";
+  }
+
+  if (type === "print") {
+    timeLeft -= 10;
+    document.getElementById("msg").innerText =
+      "✅ 你已成功連接印表機並列印完成！";
+  }
+
+  if (type === "video") {
+    timeLeft -= 30;
+    document.getElementById("msg").innerText =
+      "⚠ 觀看影片非學習用途，請注意使用規範！";
+  }
+
+  if (type === "game") {
+    document.getElementById("msg").innerText =
+      "❌ 違規行為！電腦禁止遊戲用途！管理員已記錄。";
+    setTimeout(endGame, 1200);
+    return;
+  }
+
+  if (timeLeft <= 0) {
+    setTimeout(endGame, 800);
+  }
+
+  updateTime();
+}
+
+function endGame() {
+  document.getElementById("gameBox").innerHTML =
+    "<h2>⏰ 使用時間結束</h2>" +
+    "<p>你的電腦使用時間已結束，請記得到櫃檯處理續借或登出。</p>" +
+    "<button onclick='nextLevel()'>進入下一關：續借判斷</button>";
+}
+
+function nextLevel() {
+  window.location.href = "computer4.html"; 
+  // ✅ 下一關我們會叫 computer4.html（時間 + 排隊 + 續借）
+}
+
+updateTime();
+</script>
+
+</body>
+</html>
