@@ -90,19 +90,30 @@ body {
 <body>
 
 <div class="container">
-  <h2>📚 館藏找書挑戰</h2>
-  <p>左邊是題示（書封或作者介紹），請使用館藏查詢確認後，從下方按鈕選出正確樓層！</p>
+  <h2>🔎 館藏找書挑戰</h2>
+  <p>請點選下方"在新分頁開啟館藏查詢"按鈕，使用館藏查詢確認後，選出正確樓層！</p>
 
   <div class="top-area">
-    <!-- 書封 / 作者介紹圖片 -->
-    <img class="book-img" src="https://i.imgur.com/9gJ7Ude.jpeg">
+    <!-- 題目 1：書封 / 作者介紹 -->
+<div class="question-block">
+  <img class="book-img" src="https://i.imgur.com/9gJ7Ude.jpeg">
 
-    <!-- 右側文字敘述（可自行更改） -->
-    <div class="desc-box">
-      <h3>書籍題示 / 作者介紹</h3>
-      <p>請根據左圖書籍資訊，到館藏查詢確認樓層後，在下方選擇正確答案。</p>
-    </div>
+  <div class="desc-box">
+    <h3>完全命中NEW TOEIC新多益全真模擬試題+解析</h3>
+    <p>小美正在準備多益考試，她想要借這本書，請告訴她這本書在哪一層樓呢?</p>
   </div>
+</div>
+
+<!-- 題目 2：第二題（敘述可完全不同）-->
+<div class="question-block">
+  <img class="book-img" src="https://i.imgur.com/9gJ7Ude.jpeg">
+
+  <div class="desc-box">
+    <h3>東野圭吾</h3>
+    <p>小明是東野圭吾的超級大粉絲，請問這位作者的書分布在哪一層樓呢?</p>
+  </div>
+</div>
+
 
   <!-- 樓層選項按鈕 -->
   <div class="floor-buttons">
@@ -117,7 +128,7 @@ body {
   <!-- 開新分頁查詢按鈕 -->
   <button class="search-btn"
           onclick="window.open('https://library.ntust.edu.tw/p/407-1049-632-1.php?Lang=zh-tw','_blank');">
-    🔍 在新分頁開啟館藏查詢
+    🖱️ 在新分頁開啟館藏查詢
   </button>
 
 </div>
