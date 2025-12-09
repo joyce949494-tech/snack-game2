@@ -59,10 +59,14 @@ body {
 
   <p>請選擇你要進行的行為：</p>
 
-<button class="study action-btn" onclick="doAction('study')">查資料 / 打報告（30 分）</button>
-<button class="print action-btn" onclick="doAction('print')">連接印表機列印（10 分）</button>
-<button class="video action-btn" onclick="doAction('video')">看影片（30 分）</button>
+<button class="download action-btn" onclick="doAction('download')">下載非法軟體（違規）</button>
+<button class="study action-btn" onclick="doAction('study')">趕期末報告（50 分）</button>
+<button class="print action-btn" onclick="doAction('print')">連接印表機列印二退單（10 分）</button>
+<button class="video action-btn" onclick="doAction('video')">帶家裡的CD來看影片（違規）</button>
+<button class="search action-btn" onclick="doAction('search')">查詢聖誕節巧克力的食譜（30 分）</button>
+<button class="dinner action-btn" onclick="doAction('dinner')">問ChatGPT晚餐要吃什麼（20 分）</button>
 <button class="game action-btn" onclick="doAction('game')">打遊戲（違規）</button>
+<button class="sing action-btn" onclick="doAction('sing')">搶Twice的演唱會門票（10 分）</button>
 
 
   <div id="msg"></div>
@@ -81,30 +85,56 @@ function doAction(type) {
     endGame();
     return;
   }
-
-  if (type === "study") {
-    timeLeft -= 30;
+  
+  if (type === "download") {
     document.getElementById("msg").innerText =
-      "✅ 你正在查資料與完成報告，合理使用電腦中。";
+      "❌ 違規行為！禁止使用非法軟體！";
+    setTimeout(endGame, 1200);
+    return;
+  }
+  
+  if (type === "study") {
+    timeLeft -= 50;
+    document.getElementById("msg").innerText =
+      "✅ 合理使用電腦中，祝期末歐趴!";
   }
 
   if (type === "print") {
     timeLeft -= 10;
     document.getElementById("msg").innerText =
-      "✅ 你已成功連接印表機並列印完成！";
+      "✅ 已成功連接印表機並列印完成！";
   }
 
   if (type === "video") {
-    timeLeft -= 30;
     document.getElementById("msg").innerText =
-      "⚠ 觀看影片非學習用途，請注意使用規範！";
+      "❌ 違規行為！電腦禁止撥放家用版光碟片！";
+    setTimeout(endGame, 1200);
+    return;
   }
 
+  if (type === "search") {
+    timeLeft -= 30;
+    document.getElementById("msg").innerText =
+      "✅ 聖誕快樂，祝您感情順利~";
+  }
+
+  if (type === "dinner") {
+    timeLeft -= 20;
+    document.getElementById("msg").innerText =
+      "✅ ChatGPT: 今晚，我想來點...";
+  }
+  
   if (type === "game") {
     document.getElementById("msg").innerText =
       "❌ 違規行為！電腦禁止遊戲用途！管理員已記錄。";
     setTimeout(endGame, 1200);
     return;
+  }
+
+  if (type === "sing") {
+    timeLeft -= 10;
+    document.getElementById("msg").innerText =
+      "✅ 手速太慢，沒搶到QQ";
   }
 
   if (timeLeft <= 0) {
