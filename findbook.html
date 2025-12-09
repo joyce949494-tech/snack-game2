@@ -1,154 +1,126 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8" />
-<title>找書挑戰 — 館藏查詢</title>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<title>館藏找書挑戰</title>
+
 <style>
-  body { font-family: "Microsoft JhengHei", sans-serif; background:#f6f8fb; margin:0; padding:18px; color:#222; }
-  .wrap { max-width:1100px; margin:auto; background:white; border-radius:12px; padding:16px; box-shadow:0 6px 20px rgba(0,0,0,0.08); }
-  h2{ margin:6px 0 14px 0; font-size:20px; }
-  .layout { display:flex; gap:14px; flex-wrap:wrap; }
-  .left, .right { background:#fff; border-radius:8px; padding:12px; box-shadow:0 3px 8px rgba(0,0,0,0.04); }
-  .left { flex:1 1 320px; min-width:260px; max-width:420px; }
-  .right { flex:2 1 520px; min-width:300px; }
-  .book-img { width:100%; border-radius:8px; object-fit:contain; background:#eee; }
-  .desc { font-size:15px; line-height:1.5; margin-top:8px; }
-  iframe { width:100%; height:520px; border:1px solid #ddd; border-radius:8px; background:white; }
-  .floor-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
-  .floor-btn { flex:0 0 120px; padding:10px; border-radius:8px; border:none; cursor:pointer; background:#1976d2; color:white; font-size:15px; }
-  .floor-btn.secondary { background:#7b1fa2; }
-  #msg { margin-top:12px; min-height:44px; font-size:15px; }
-  .controls { display:flex; gap:8px; margin-top:10px; }
-  .link-btn { padding:8px 12px; background:#388e3c; color:white; border-radius:8px; border:none; cursor:pointer; }
-  .next-btn { padding:8px 12px; background:#ff9800; color:white; border-radius:8px; border:none; cursor:pointer; display:none; }
-  @media (max-width:900px){ .layout{flex-direction:column} iframe{height:420px} }
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: #eef5ff;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+
+.container {
+  width: 85%;
+  max-width: 1100px;
+  margin: auto;
+  background: white;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 0 18px rgba(0,0,0,0.15);
+}
+
+/* ----- 上方題目區排版：圖片置左，文字置右 ----- */
+.top-area {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.book-img {
+  width: 350px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.desc-box {
+  width: 320px;
+  text-align: left;
+  padding-top: 20px;
+}
+
+/* ----- 樓層按鈕 ----- */
+.floor-buttons {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.floor-btn {
+  background: #4a89e8;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 10px;
+  font-size: 17px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.floor-btn:hover {
+  background: #3569c9;
+}
+
+/* ----- 開新分頁查詢按鈕 ----- */
+.search-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  margin-top: 30px;
+  padding: 14px 30px;
+  font-size: 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.search-btn:hover {
+  background: #1f8a39;
+}
 </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <h2>館藏找書挑戰</h2>
-    <p>左邊顯示題目（書封或作者介紹），右邊是圖書館館藏查詢頁。請使用館藏查詢確認樓層，然後從下方樓層按鈕選出正確樓層。</p>
 
-    <div class="layout">
-      <div class="left">
-        <div id="leftContent">
-          <!-- 書圖或文字會顯示在這 -->
-        </div>
-        <div class="floor-row" id="floorButtons"></div>
-        <div id="msg"></div>
-        <div class="controls">
-          <button class="link-btn" id="openSearch">在新分頁開啟館藏查詢</button>
-          <button class="next-btn" id="nextBtn">下一題</button>
-        </div>
-      </div>
+<div class="container">
+  <h2>📚 館藏找書挑戰</h2>
+  <p>左邊是題示（書封或作者介紹），請使用館藏查詢確認後，從下方按鈕選出正確樓層！</p>
 
-      <div class="right">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <strong>圖書館館藏查詢</strong>
-          <small style="color:#666">（若被阻擋，請用「在新分頁開啟館藏查詢」）</small>
-        </div>
-        <!-- 下面的 iframe 會載入館藏系統 -->
-        <iframe id="libFrame" src="https://sierra.lib.ntust.edu.tw/*cht" title="館藏查詢"></iframe>
-      </div>
+  <div class="top-area">
+    <!-- 書封 / 作者介紹圖片 -->
+    <img class="book-img" src="https://i.imgur.com/9gJ7Ude.jpeg">
+
+    <!-- 右側文字敘述（可自行更改） -->
+    <div class="desc-box">
+      <h3>書籍題示 / 作者介紹</h3>
+      <p>請根據左圖書籍資訊，到館藏查詢確認樓層後，在下方選擇正確答案。</p>
     </div>
   </div>
 
-<script>
-/*
-  使用說明：
-  - questions 陣列每一題包含:
-     type: "image" 或 "text"
-     content: 圖片網址 或 文字說明 (作者或書介)
-     correctFloor: 你要判定的正確樓層（字串）
-     help: （選填）答錯時給予教學提示
-  - 改 questions 陣列即可更換題目
-*/
+  <!-- 樓層選項按鈕 -->
+  <div class="floor-buttons">
+    <button class="floor-btn">B1</button>
+    <button class="floor-btn">1樓</button>
+    <button class="floor-btn">2樓</button>
+    <button class="floor-btn">3樓</button>
+    <button class="floor-btn">4樓</button>
+    <button class="floor-btn">參考室</button>
+  </div>
 
-const questions = [
-  // 範例第一題：以書名/書封查詢（請把 correctFloor 改成實際樓層）
-  {
-    id:1,
-    type:"image",
-    content:"https://i.imgur.com/LtJL7i9.jpeg", // 書封截圖或封面
-    correctFloor:"3樓",  // ← 改成正確樓層
-    help:"提示：這本書屬於工程學類，通常在 3 樓的參考書區"
-  },
-  // 範例第二題：以作者或文字介紹查詢（作者可複製到館藏系統搜尋）
-  {
-    id:2,
-    type:"text",
-    content:"作者：王小明；簡介：本書探討資料庫設計與應用，為大學本科教材", 
-    correctFloor:"2樓", // ← 改成正確樓層
-    help:"提示：教材與教科書通常放在 2 樓教科書/參考區"
-  }
-];
+  <!-- 開新分頁查詢按鈕 -->
+  <button class="search-btn"
+          onclick="window.open('https://library.ntust.edu.tw/p/407-1049-632-1.php?Lang=zh-tw','_blank');">
+    🔍 在新分頁開啟館藏查詢
+  </button>
 
-let current = 0;
-const left = document.getElementById('leftContent');
-const floorButtons = document.getElementById('floorButtons');
-const msg = document.getElementById('msg');
-const libFrame = document.getElementById('libFrame');
-const openSearch = document.getElementById('openSearch');
-const nextBtn = document.getElementById('nextBtn');
+</div>
 
-// 樣本樓層按鈕（你可依圖書館實際樓層改變）
-const floors = ["B1","1樓","2樓","3樓","4樓","參考室"];
-
-function renderQuestion() {
-  msg.innerText = '';
-  nextBtn.style.display = 'none';
-  floorButtons.innerHTML = '';
-
-  if(current >= questions.length) {
-    left.innerHTML = "<h3>🎉 全部完成！</h3><p>你已完成找書挑戰。</p>";
-    libFrame.src = "about:blank";
-    return;
-  }
-
-  const q = questions[current];
-
-  if(q.type === "image") {
-    left.innerHTML = `<img class="book-img" src="${q.content}" alt="書封">`;
-  } else {
-    left.innerHTML = `<div class="desc"><strong>請用作者 / 關鍵字查詢：</strong><p>${q.content}</p></div>`;
-  }
-
-  // 建立樓層按鈕
-  floors.forEach((f, idx) => {
-    const b = document.createElement('button');
-    b.className = 'floor-btn' + (idx%2? ' secondary':'');
-    b.innerText = f;
-    b.onclick = () => checkFloor(f);
-    floorButtons.appendChild(b);
-  });
-
-  // openSearch 會使用 iframe 現在的 URL（或固定館藏首頁）
-  openSearch.onclick = () => {
-    // 若你想要直接把關鍵字放到圖書館查詢，可改成帶 query 的 URL
-    window.open(libFrame.src, '_blank');
-  };
-}
-
-function checkFloor(selected) {
-  const q = questions[current];
-  if(selected === q.correctFloor) {
-    msg.innerHTML = `✅ 正確！這本書在「${q.correctFloor}」。`;
-    nextBtn.style.display = 'inline-block';
-    // 記分或其他回饋可放這裡
-  } else {
-    msg.innerHTML = `❌ 好像不對，${q.help ? q.help : '再試試看或用館藏系統尋找'}。`;
-  }
-}
-
-nextBtn.onclick = () => {
-  current++;
-  renderQuestion();
-};
-
-// 初始
-renderQuestion();
-
-</script>
 </body>
 </html>
