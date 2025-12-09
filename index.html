@@ -80,9 +80,9 @@ function showFood() {
 function check(ans) {
   if(ans === foods[i].ans) {
     score++;
-    document.getElementById("msg").innerText = "香氣精靈說：" + foods[i].tip;
+    document.getElementById("msg").innerText = foods[i].tip;
   } else {
-    document.getElementById("msg").innerText = "香氣精靈說：" + foods[i].tip;
+    document.getElementById("msg").innerText = foods[i].tip;
   }
 
   setTimeout(() => {
