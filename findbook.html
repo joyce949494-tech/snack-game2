@@ -68,7 +68,7 @@ body {
   background: #3569c9;
 }
 
-/* ----- 開新分頁查詢按鈕 ----- */
+/* ----- 查詢按鈕 ----- */
 .search-btn {
   background: #28a745;
   color: white;
@@ -80,9 +80,12 @@ body {
   cursor: pointer;
   transition: 0.2s;
 }
-
 .search-btn:hover {
   background: #1f8a39;
+}
+
+.hidden {
+  display: none;
 }
 </style>
 </head>
@@ -91,47 +94,89 @@ body {
 
 <div class="container">
   <h2>🔎 館藏找書挑戰</h2>
-  <p>請點選下方"在新分頁開啟館藏查詢"按鈕，使用館藏查詢確認後，選出正確樓層！</p>
+  <p>請使用館藏查詢確認後，選出正確樓層！</p>
 
-  <div class="top-area">
-    <!-- 題目 1：書封 / 作者介紹 -->
-<div class="question-block">
-  <img class="book-img" src="https://i.imgur.com/tqcEUgY.jpeg">
+  <!-- ==================== 第一題 ==================== -->
+  <div id="q1" class="top-area">
+    <img class="book-img" src="https://i.imgur.com/tqcEUgY.jpeg">
 
-  <div class="desc-box">
-    <h3>完全命中NEW TOEIC新多益全真模擬試題+解析</h3>
-    <p>小美正在準備多益考試，她想要借這本書，請告訴她這本書在哪一層樓呢?</p>
+    <div class="desc-box">
+      <h3>完全命中 NEW TOEIC 模擬試題</h3>
+      <p>小美正在準備多益考試，她想借這本書，請告訴她這本書在哪一層樓呢?</p>
+    </div>
   </div>
-</div>
 
-<!-- 題目 2：第二題（敘述可完全不同）-->
-<div class="question-block">
-  <img class="book-img" src="https://i.imgur.com/9gJ7Ude.jpeg">
+  <!-- ==================== 第二題（先隱藏） ==================== -->
+  <div id="q2" class="top-area hidden">
+    <img class="book-img" src="https://i.imgur.com/9gJ7Ude.jpeg">
 
-  <div class="desc-box">
-    <h3>東野圭吾</h3>
-    <p>小明是東野圭吾的超級大粉絲，請問這位作者的書分布在哪一層樓呢?</p>
+    <div class="desc-box">
+      <h3>東野圭吾</h3>
+      <p>小明是東野圭吾的超級粉絲，請問他的書在第幾層樓呢?</p>
+    </div>
   </div>
-</div>
 
 
-  <!-- 樓層選項按鈕 -->
+  <!-- 樓層按鈕 -->
   <div class="floor-buttons">
-    <button class="floor-btn">B1</button>
-    <button class="floor-btn">1樓</button>
-    <button class="floor-btn">2樓</button>
-    <button class="floor-btn">3樓</button>
-    <button class="floor-btn">4樓</button>
-    <button class="floor-btn">參考室</button>
+    <button class="floor-btn" onclick="checkAnswer(1,'1樓')">1樓</button>
+    <button class="floor-btn" onclick="checkAnswer(1,'2樓')">2樓</button>
+    <button class="floor-btn" onclick="checkAnswer(1,'3樓')">3樓</button>
+    <button class="floor-btn" onclick="checkAnswer(1,'4樓')">4樓</button>
+    <button class="floor-btn" onclick="checkAnswer(1,'前棟3樓')">前棟3樓</button>
   </div>
 
   <!-- 開新分頁查詢按鈕 -->
   <button class="search-btn"
-          onclick="window.open('https://library.ntust.edu.tw/p/407-1049-632-1.php?Lang=zh-tw','_blank');">
+          onclick="window.open('https://sierra.lib.ntust.edu.tw/*cht','_blank');">
     🖱️ 在新分頁開啟館藏查詢
   </button>
 
 </div>
+
+<script>
+// ===== 正確答案設定（你之後可自行改） =====
+const answers = {
+  q1: "3樓",        // 第一題
+  q2: "2樓"         // 第二題
+};
+
+let currentQuestion = 1;
+
+// ===== 檢查答案 =====
+function checkAnswer(questionNumber, selectedFloor) {
+
+  if (questionNumber === 1) {
+    if (selectedFloor === answers.q1) {
+      alert("✔️答對了！進入下一題！");
+      goToQ2();
+    } else {
+      alert("❌答錯囉！請再確認一次～");
+    }
+  }
+
+  if (questionNumber === 2) {
+    if (selectedFloor === answers.q2) {
+      alert("✔️太棒了！全部答對！");
+    } else {
+      alert("❌不正確喔～再試看看！");
+    }
+  }
+}
+
+// ===== 顯示第二題 =====
+function goToQ2() {
+  document.getElementById("q1").classList.add("hidden");
+  document.getElementById("q2").classList.remove("hidden");
+
+  // 改變按鈕動作（接下來要檢查第二題）
+  const buttons = document.querySelectorAll(".floor-btn");
+  buttons.forEach(btn => {
+    let text = btn.innerText;
+    btn.setAttribute("onclick", `checkAnswer(2,'${text}')`);
+  });
+}
+</script>
 
 </body>
 </html>
