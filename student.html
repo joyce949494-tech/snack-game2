@@ -44,6 +44,8 @@ body {
 
 .npc-img {
   width: 100px;
+  height: 100px;
+  object-fit: cover;
   border-radius: 50%;
 }
 
@@ -133,9 +135,9 @@ const questions = [
     title: "太陽餅問：",
     desc: "我和朋友想預約 10:00–12:00，我可以選哪間討論小間？(請查看預約表)",
     choices: [
-      {text: "D01", correct: false}
+      {text: "D01", correct: false},
       {text: "D02", correct: true},
-      {text: "D03", correct: false}
+      {text: "D03", correct: false},
       {text: "D04", correct: false}
     ],
     showSchedule: true
