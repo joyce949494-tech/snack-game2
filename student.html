@@ -20,7 +20,7 @@ body {
   padding-top: 20px;
 }
 
-/* NPC 區：使用 random 排列 */
+/* NPC 區 */
 .npc-area {
   display: flex;
   flex-wrap: wrap;
@@ -29,15 +29,27 @@ body {
   margin-top: 20px;
 }
 
-/* 個別 NPC 圖示 */
-.npc {
-  width: 120px;
+/* NPC 圖片 + 名字容器 */
+.npc-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   cursor: pointer;
   transition: 0.2s;
 }
 
-.npc:hover {
-  transform: scale(1.08);
+.npc-box:hover {
+  transform: scale(1.05);
+}
+
+.npc-img {
+  width: 100px;
+  border-radius: 50%;
+}
+
+.npc-name {
+  margin-top: 5px;
+  font-weight: bold;
 }
 
 /* 題目跳出視窗 */
@@ -84,7 +96,7 @@ body {
   <h2>📚 討論室諮詢中心</h2>
   <p>請點擊任一位學生，幫助他們解決問題！</p>
 
-  <!-- NPC 區（JS 會隨機排序） -->
+  <!-- NPC 區 -->
   <div id="npcArea" class="npc-area"></div>
 </div>
 
@@ -105,7 +117,8 @@ body {
 const questions = [
   {
     id: 1,
-    img: "https://i.imgur.com/7Wf4YIz.png", // 暫時 NPC 圖
+    img: "https://i.imgur.com/7Wf4YIz.png",
+    name: "小美",
     title: "人數判定",
     desc: "我們有 2 個人，可以借用討論室嗎？",
     choices: [
@@ -116,6 +129,7 @@ const questions = [
   {
     id: 2,
     img: "https://i.imgur.com/7Wf4YIz.png",
+    name: "小華",
     title: "時段判斷",
     desc: "我想預約 13:00–15:00，有空的討論室嗎？(請查看預約表)",
     choices: [
@@ -127,6 +141,7 @@ const questions = [
   {
     id: 3,
     img: "https://i.imgur.com/7Wf4YIz.png",
+    name: "小明",
     title: "遲到問題",
     desc: "我預約 10:00–12:00，但我 10:30 才到，還能使用嗎？",
     choices: [
@@ -137,6 +152,7 @@ const questions = [
   {
     id: 4,
     img: "https://i.imgur.com/7Wf4YIz.png",
+    name: "小美2",
     title: "飲料問題",
     desc: "我可以拿飲料進去討論室嗎？",
     choices: [
@@ -147,6 +163,7 @@ const questions = [
   {
     id: 5,
     img: "https://i.imgur.com/7Wf4YIz.png",
+    name: "小強",
     title: "借用時間",
     desc: "討論室一次最多能借用多久呢？",
     choices: [
@@ -163,20 +180,34 @@ function renderNPCs() {
   const area = document.getElementById("npcArea");
   area.innerHTML = "";
 
-  // 隨機排序
+  if (remaining.length === 0) {
+    // 全部完成，跳轉結算頁面
+    window.location.href = "pass.html"; // 這裡改成你的完成頁面
+    return;
+  }
+
   const shuffled = [...remaining].sort(() => Math.random() - 0.5);
 
   shuffled.forEach(q => {
-    let npc = document.createElement("img");
-    npc.src = q.img;
-    npc.className = "npc";
-    npc.onclick = () => openQuestion(q.id);
-    area.appendChild(npc);
+    let npcBox = document.createElement("div");
+    npcBox.className = "npc-box";
+    npcBox.onclick = () => openQuestion(q.id);
+
+    let npcImg = document.createElement("img");
+    npcImg.src = q.img;
+    npcImg.className = "npc-img";
+
+    let npcName = document.createElement("div");
+    npcName.className = "npc-name";
+    npcName.innerText = q.name;
+
+    npcBox.appendChild(npcImg);
+    npcBox.appendChild(npcName);
+    area.appendChild(npcBox);
   });
 }
 
 renderNPCs();
-
 
 // ---------- 3️⃣ 顯示題目 ----------
 function openQuestion(id) {
@@ -191,7 +222,6 @@ function openQuestion(id) {
   document.getElementById("qTitle").innerText = q.title;
   document.getElementById("qDesc").innerText = q.desc;
 
-  // 顯示或隱藏預約表
   document.getElementById("scheduleImg").style.display =
     q.showSchedule ? "block" : "none";
 
@@ -207,22 +237,18 @@ function openQuestion(id) {
   });
 }
 
-
 // ---------- 4️⃣ 選項判定 ----------
 function checkAnswer(id, isCorrect) {
   alert(isCorrect ? "✔ 答對了！" : "✘ 再想想～");
 
   if (isCorrect) {
-    // 刪除該 NPC
     remaining = remaining.filter(x => x.id !== id);
   }
 
-  // 回主畫面
   backToMain();
 }
 
-
-// ---------- 5️⃣ 回到主畫面 ----------
+// ---------- 5️⃣ 回主畫面 ----------
 function backToMain() {
   document.getElementById("questionBox").style.display = "none";
   document.getElementById("npcArea").style.display = "flex";
