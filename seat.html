@@ -41,8 +41,11 @@ body {
 /* 座位拖放區域 */
 .seat-zone {
   position: absolute;
-  border: 2px dashed transparent; /* 可視化時可改成紅框調整位置 */
+  border: 2px dashed transparent;
   cursor: pointer;
+  z-index: 10; /* ⭐ 讓座位區在圖片上層 */
+}
+
 }
 #msg {
   margin-top: 20px;
