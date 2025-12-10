@@ -1,24 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>三樓閱覽席｜分配座位遊戲</title>
+
+<style>
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: #eef6ff;
+  text-align: center;
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+/* 學生卡片 */
+.student {
+  width: 130px;
+  padding: 12px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.15);
+  margin: 10px;
+  cursor: grab;
+}
+
+.student:active {
+  cursor: grabbing;
+}
+
+#students {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+
+/* 座位圖 */
+.map-container {
+  position: relative;
+  width: 900px;
+  margin: 20px auto;
+}
+
+.map-container img {
+  width: 100%;
+  border-radius: 12px;
+  pointer-events: none; /* 避免阻擋拖曳 */
+}
+
+/* 座位區域 */
+.seat-zone {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 10; /* 保證在圖片上層 */
+}
+
+.seat-zone.occupied {
+  background: white !important;
+  border: 2px solid #ccc;
+}
+
+#msg {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #444;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🔹 三樓閱覽席｜替學生分配座位</h2>
+<p>把學生組別拖曳到允許的座位中（同組只需拖一次）</p>
+
+<div id="students"></div>
+
+<!-- ★★★★★ 座位圖區域 ★★★★★ -->
 <div class="map-container">
-  <img src="seatmap.jpg">
+  <img src="https://i.imgur.com/B9oHV5K.jpeg">
 
-  <!-- 組1可用座位 -->
-  <div class="seat-zone" data-seat="93" data-allow="1" style="top:50px; left:30px; width:40px; height:40px;"></div>
-  <div class="seat-zone" data-seat="98" data-allow="1" style="top:150px; left:30px; width:40px; height:40px;"></div>
-  <div class="seat-zone" data-seat="105" data-allow="1" style="top:50px; left:450px; width:40px; height:40px;"></div>
-  <div class="seat-zone" data-seat="125" data-allow="1" style="top:150px; left:450px; width:40px; height:40px;"></div>
+  <!-- 組1專用：93 / 98 / 105 / 125 -->
+  <div class="seat-zone" data-seat="93"  data-allow="1" style="top:120px; left:40px;"></div>
+  <div class="seat-zone" data-seat="98"  data-allow="1" style="top:260px; left:40px;"></div>
+  <div class="seat-zone" data-seat="105" data-allow="1" style="top:120px; left:740px;"></div>
+  <div class="seat-zone" data-seat="125" data-allow="1" style="top:260px; left:740px;"></div>
 
-  <!-- 組2 + 組3可用座位（可交叉使用） -->
-  <div class="seat-zone" data-seat="113" data-allow="23" style="top:200px; left:300px; width:40px; height:40px;"></div>
-  <div class="seat-zone" data-seat="114" data-allow="23" style="top:200px; left:350px; width:40px; height:40px;"></div>
+  <!-- 組2＋組3共用：113 / 114 / 121 / 122 / 123 / 129 / 130 -->
+  <div class="seat-zone" data-seat="113" data-allow="23" style="top:330px; left:380px;"></div>
+  <div class="seat-zone" data-seat="114" data-allow="23" style="top:330px; left:430px;"></div>
 
-  <div class="seat-zone" data-seat="121" data-allow="23" style="top:260px; left:300px; width:40px; height:40px;"></div>
-  <div class="seat-zone" data-seat="122" data-allow="23" style="top:260px; left:350px; width:40px; height:40px;"></div>
-  <div class="seat-zone" data-seat="123" data-allow="23" style="top:260px; left:400px; width:40px; height:40px;"></div>
+  <div class="seat-zone" data-seat="121" data-allow="23" style="top:390px; left:380px;"></div>
+  <div class="seat-zone" data-seat="122" data-allow="23" style="top:390px; left:430px;"></div>
+  <div class="seat-zone" data-seat="123" data-allow="23" style="top:390px; left:480px;"></div>
 
-  <div class="seat-zone" data-seat="129" data-allow="23" style="top:320px; left:300px; width:40px; height:40px;"></div>
-  <div class="seat-zone" data-seat="130" data-allow="23" style="top:320px; left:350px; width:40px; height:40px;"></div>
+  <div class="seat-zone" data-seat="129" data-allow="23" style="top:450px; left:380px;"></div>
+  <div class="seat-zone" data-seat="130" data-allow="23" style="top:450px; left:430px;"></div>
 </div>
 
+<p id="msg"></p>
+
+<!-- ★★★★★ JavaScript ★★★★★ -->
+<script>
+// 學生分組
 const students = [
   {id:1, name:"小美", group:1},
   {id:2, name:"小傑", group:2},
@@ -30,7 +119,7 @@ const students = [
 let remainingGroups = [...new Set(students.map(s=>s.group))];
 const msg = document.getElementById("msg");
 
-// 產生學生卡
+// 生成學生卡
 function renderStudents() {
   const box = document.getElementById("students");
   box.innerHTML = "";
@@ -47,25 +136,25 @@ function renderStudents() {
 }
 renderStudents();
 
-// 座位放置
+// 座位拖曳處理
 document.querySelectorAll(".seat-zone").forEach(zone=>{
   zone.addEventListener("dragover", e => e.preventDefault());
-  
+
   zone.addEventListener("drop", e=>{
     e.preventDefault();
     const groupId = e.dataTransfer.getData("group");
     const card = document.getElementById("group-"+groupId);
     if(!card) return;
 
-    // 座位已被使用
+    // 座位是否被佔用
     if(zone.classList.contains("occupied")) {
       showMsg("❌ 這個座位已經有人了！");
       return;
     }
 
-    const allowed = zone.dataset.allow; // "1"、"23"
-    
-    // 規則檢查：組1只能放 1；組2/3 都可以放 "23"
+    // 座位允許哪些組
+    const allowed = zone.dataset.allow;
+
     if(!allowed.includes(groupId)) {
       showMsg("❌ 這組不能坐這個座位！");
       return;
@@ -74,12 +163,14 @@ document.querySelectorAll(".seat-zone").forEach(zone=>{
     // 成功放置
     zone.classList.add("occupied");
     card.remove();
+
+    // 移除該組
     remainingGroups = remainingGroups.filter(x => x != groupId);
     showMsg("✔ 組 " + groupId + " 安排成功！");
 
     // 全部分配完成
     if(remainingGroups.length === 0){
-      showMsg("🎉 全部分組成功安排座位！");
+      showMsg("🎉 全部學生座位安排完成！");
       setTimeout(()=>{
         window.location.href = "npc_question_page.html";
       }, 1800);
@@ -87,6 +178,11 @@ document.querySelectorAll(".seat-zone").forEach(zone=>{
   });
 });
 
+// 顯示訊息
 function showMsg(t){
   msg.innerText = t;
 }
+</script>
+
+</body>
+</html>
