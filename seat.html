@@ -2,223 +2,136 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>三樓閱覽席｜分組選位遊戲</title>
-
+<title>三樓閱覽席｜分配座位遊戲</title>
 <style>
 body {
-  font-family: "Microsoft JhengHei";
+  font-family: "Microsoft JhengHei", sans-serif;
   background: #eef6ff;
   text-align: center;
   padding: 20px;
 }
 
 /* 學生卡片 */
-.group {
-  width: 140px;
-  padding: 15px;
+.student {
+  width: 120px;
+  padding: 12px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 0 8px rgba(0,0,0,0.15);
   margin: 10px;
   cursor: grab;
 }
-.group:active { cursor: grabbing; }
 
-/* 座位地圖外框 */
-.map {
-  width: 80%;
-  max-width: 850px;
-  margin: 25px auto;
-  padding: 20px;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+.student:active {
+  cursor: grabbing;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-  margin-top: 20px;
+/* 座位圖容器 */
+.map-container {
+  position: relative;
+  width: 700px;
+  margin: 20px auto;
 }
 
-/* 座位樣式 */
-.seat {
-  width: 95px;
-  height: 95px;
+.map-container img {
+  width: 100%;
   border-radius: 12px;
-  background: #dbe8ff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  transition: 0.2s;
 }
 
-.seat.available { background: #2e3a4d; color: white; }
-.seat.temp { background: #ffcc33; }
-.seat.disabled { background: #e5e5e5; color: #aaa; }
-.seat.chosen { background: white; color: #444; border: 2px solid #2e3a4d; }
-
-.seat.filled {
-  background: #4a7fe8;
-  color: white;
+/* 座位拖放區域 */
+.seat-zone {
+  position: absolute;
+  border: 2px dashed transparent; /* 可視化時可改成紅框調整位置 */
+  cursor: pointer;
 }
-
-/* 訊息 */
 #msg {
-  margin-top: 25px;
-  font-size: 22px;
+  margin-top: 20px;
+  font-size: 20px;
   font-weight: bold;
   color: #444;
 }
 </style>
 </head>
-
 <body>
 
-<h2>🔷 三樓閱覽席分組選位</h2>
-<p>請將每組拖移到正確的座位區。</p>
+<h2>🔹 三樓閱覽席｜替學生分配座位</h2>
+<p>拖曳學生卡到座位區域（多人一起坐的組只需拖一次）</p>
 
-<!-- 學生分組 -->
-<div id="groups" style="display:flex; justify-content:center; flex-wrap:wrap;"></div>
+<div id="students" style="display:flex; justify-content:center; flex-wrap:wrap;"></div>
 
-<!-- 座位地圖 -->
-<div class="map">
-  <h3>可選座位區</h3>
-  <div class="grid" id="seatGrid"></div>
+<div class="map-container">
+  <img src="https://i.imgur.com/B9oHV5K.jpeg" alt="座位圖">
+
+  <!-- 可選座位區域（用座標定位） -->
+  <!-- 範例座標，可調整以符合座位圖 -->
+  <div class="seat-zone" id="seat-113" style="top:60px; left:80px; width:40px; height:40px;"></div>
+  <div class="seat-zone" id="seat-114" style="top:60px; left:130px; width:40px; height:40px;"></div>
+  <div class="seat-zone" id="seat-121" style="top:120px; left:80px; width:40px; height:40px;"></div>
+  <div class="seat-zone" id="seat-122" style="top:120px; left:130px; width:40px; height:40px;"></div>
+  <div class="seat-zone" id="seat-123" style="top:120px; left:180px; width:40px; height:40px;"></div>
 </div>
 
 <p id="msg"></p>
 
 <script>
-// ---------------------------------------
-// 分組設定
-// ---------------------------------------
-const groups = [
-  { id: "A", size: 3, seats: [] },
-  { id: "B", size: 2, seats: [] },
-  { id: "C", size: 2, seats: [] },
-  { id: "D", size: 1, seats: [] }
+// 學生分組（最多 3 人一組）
+const students = [
+  {id:1, name:"小美", group:1},
+  {id:2, name:"小傑", group:2},
+  {id:3, name:"阿華", group:3},
+  {id:4, name:"小林", group:3},
+  {id:5, name:"小王", group:2}
 ];
 
-// 解答（唯一正解）
-const correct = {
-  A: ["121", "122", "123"],
-  B: ["113", "114"],
-  C: ["129", "130"],
-  D: ["093"] // D 組可以彈性，但這裡先固定為 093
-};
+let remainingGroups = [...new Set(students.map(s=>s.group))];
 
-// ---------------------------------------
-// 座位資料
-// ---------------------------------------
-const seats = [
-  "093","098","105","125","129","130",
-  "113","114","121","122","123"
-];
-
-// ---------------------------------------
-// 產生分組卡片
-// ---------------------------------------
-function renderGroups(){
-  const box = document.getElementById("groups");
+// 生成學生卡
+function renderStudents() {
+  const box = document.getElementById("students");
   box.innerHTML = "";
-  groups.forEach(g=>{
+  // 每組只生成一次卡片
+  remainingGroups.forEach(g=>{
+    const groupStudents = students.filter(s=>s.group===g);
     const div = document.createElement("div");
-    div.className = "group";
-    div.id = "group-" + g.id;
+    div.className = "student";
     div.draggable = true;
-    div.ondragstart = e => e.dataTransfer.setData("group", g.id);
-    div.innerHTML = `<b>${g.id} 組</b><br>(${g.size} 人)`;
+    div.id = "group-"+g;
+    div.innerHTML = `<b>組${g}</b><br>` + groupStudents.map(s=>s.name).join(", ");
+    div.ondragstart = e => e.dataTransfer.setData("group", g);
     box.appendChild(div);
   });
 }
 
-// ---------------------------------------
-// 生成可選座位
-// ---------------------------------------
-function renderSeats(){
-  const grid = document.getElementById("seatGrid");
-  seats.forEach(id=>{
-    const div = document.createElement("div");
-    div.className = "seat available";
-    div.id = "seat-" + id;
-    div.innerText = id;
+renderStudents();
 
-    div.ondragover = e => e.preventDefault();
-    div.ondrop = e => handleDrop(e, id);
+// 拖放處理
+const seatZones = document.querySelectorAll(".seat-zone");
+seatZones.forEach(zone=>{
+  zone.addEventListener("dragover", e=> e.preventDefault());
+  zone.addEventListener("drop", e=>{
+    e.preventDefault();
+    const groupId = e.dataTransfer.getData("group");
+    const div = document.getElementById("group-"+groupId);
+    if(!div) return;
 
-    grid.appendChild(div);
-  });
-}
+    // 成功放置
+    div.remove(); // 移除學生卡
+    remainingGroups = remainingGroups.filter(g=>g!=groupId);
+    showMsg("✔ 組" + groupId + " 安排成功！");
 
-// ---------------------------------------
-// 處理放置
-// ---------------------------------------
-function handleDrop(e, seatID){
-  const gid = e.dataTransfer.getData("group");
-  const group = groups.find(g => g.id === gid);
-
-  if(!group || group.seats.length >= group.size){
-    showMsg("❌ 這組的人數已經放滿了！");
-    return;
-  }
-
-  const seatDiv = document.getElementById("seat-" + seatID);
-
-  if(seatDiv.classList.contains("filled")){
-    showMsg("❌ 這個座位已被使用！");
-    return;
-  }
-
-  // 放進去
-  seatDiv.classList.add("filled");
-  seatDiv.innerHTML = `${seatID}\n(${gid})`;
-  group.seats.push(seatID);
-
-  checkComplete();
-}
-
-// ---------------------------------------
-// 檢查是否全部完成
-// ---------------------------------------
-function checkComplete(){
-  let allDone = groups.every(g => g.seats.length === g.size);
-  if(!allDone) return;
-
-  // 檢查是否正確
-  let ok = true;
-  groups.forEach(g=>{
-    let required = correct[g.id];
-    let placed = g.seats.sort();
-    if(required.sort().join("") !== placed.join("")){
-      ok = false;
+    // 若全部安排完成，停 2 秒後跳轉
+    if(remainingGroups.length===0){
+      showMsg("🎉 全部學生座位安排完成！");
+      setTimeout(()=> {
+        window.location.href = "npc_question_page.html"; // 你的 NPC 問題頁面
+      }, 2000);
     }
   });
+});
 
-  if(ok){
-    showMsg("🎉 選位成功！即將進入下一階段…");
-
-    // 延遲 2 秒跳轉
-    setTimeout(()=>{
-      window.location.href = "quiz.html"; // ← 修改成你的題目頁面
-    }, 2000);
-
-  }else{
-    showMsg("❌ 有組沒有放在正確的位置喔！");
-  }
+function showMsg(txt){
+  document.getElementById("msg").innerText = txt;
 }
-
-// ---------------------------------------
-function showMsg(t){
-  document.getElementById("msg").innerText = t;
-}
-
-// 初始化
-renderGroups();
-renderSeats();
 </script>
-
 </body>
 </html>
