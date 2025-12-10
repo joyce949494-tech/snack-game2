@@ -2,214 +2,116 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>三樓閱覽席｜分配座位遊戲</title>
-
+<title>三樓閱覽席 - 區塊示意圖</title>
 <style>
-body {
-  font-family: "Microsoft JhengHei";
-  background: #eef6ff;
-  text-align: center;
-  padding: 20px;
-}
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    padding: 20px;
+  }
 
-/* ——— 學生卡片 ——— */
-.student {
-  width: 120px;
-  padding: 12px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.15);
-  margin: 10px;
-  cursor: grab;
-}
+  .map-container {
+    width: 700px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
 
-.student:active {
-  cursor: grabbing;
-}
+  .section-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
 
-/* ——— 座位地圖布局 ——— */
-.map {
-  width: 80%;
-  max-width: 700px;
-  margin: 25px auto;
-  padding: 20px;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
-}
+  .room-layout {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 8px;
+    margin-top: 20px;
+  }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-  margin-top: 20px;
-}
+  .seat {
+    width: 50px;
+    height: 45px;
+    background: #d9eaff;       /* 一般座位 */
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 12px;
+    border: 1px solid #6b99c3;
+  }
 
-/* ——— 座位格子 ——— */
-.seat {
-  width: 90px;
-  height: 90px;
-  border-radius: 12px;
-  background: #dbe8ff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  transition: 0.2s;
-}
+  .seat.laptop {
+    background: #c4ffd8;        /* 筆電區（有插座） */
+    border-color: #4da56b;
+  }
 
-.seat.wall {
-  background: #b4d4ff;   /* 靠牆有插座 */
-}
+  .seat.occupied {
+    background: #333;
+    color: white;
+    border-color: #000;
+    cursor: not-allowed;
+  }
 
-.seat.laptop {
-  background: #ffcfa9;   /* 筆電區 */
-}
+  .stairs {
+    grid-column: span 2;
+    background: #eee;
+    border: 2px solid #aaa;
+    border-radius: 6px;
+    text-align: center;
+    padding-top: 12px;
+    font-size: 14px;
+    height: 80px;
+  }
 
-.seat.occupied {
-  background: #888;
-  color: white;
-}
-
-/* ——— 提示文字 ——— */
-#msg {
-  margin-top: 20px;
-  font-size: 20px;
-  font-weight: bold;
-  color: #444;
-}
+  .label {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+  }
 </style>
 </head>
 
 <body>
 
-<h2>🔌 三樓閱覽席｜替學生分配座位</h2>
-<p>拖曳學生 → 放到最適合他的座位。</p>
+<div class="map-container">
+  <div class="section-title">三樓閱覽席（左半區）</div>
 
-<!-- 學生列表 -->
-<div id="students" style="display:flex; justify-content:center; flex-wrap:wrap;">
+  <!-- 座位圖 -->
+  <div class="room-layout">
+
+    <div class="stairs">樓梯</div>
+
+    <!-- 101–110 -->
+    <div class="seat">101</div>
+    <div class="seat occupied">102</div>
+    <div class="seat">103</div>
+    <div class="seat laptop">104</div>
+    <div class="seat laptop occupied">105</div>
+    <div class="seat laptop">106</div>
+    <div class="seat">107</div>
+    <div class="seat occupied">108</div>
+
+    <!-- 111–120 -->
+    <div class="seat laptop">111</div>
+    <div class="seat laptop">112</div>
+    <div class="seat laptop occupied">113</div>
+    <div class="seat laptop">114</div>
+    <div class="seat laptop">115</div>
+    <div class="seat laptop occupied">116</div>
+    <div class="seat laptop">117</div>
+    <div class="seat">118</div>
+    <div class="seat occupied">119</div>
+    <div class="seat">120</div>
+
+  </div>
+
+  <div class="label">🟦 一般座位　🟩 筆電區（有插座）　⬛ 已有人使用</div>
+
 </div>
-
-<!-- 座位地圖 -->
-<div class="map">
-  <h3>三樓座位平面圖</h3>
-  <div class="grid" id="seatGrid"></div>
-</div>
-
-<p id="msg"></p>
-
-<script>
-// 學生需求資料
-const students = [
-  { id: 1, name: "小美", need: "normal" },
-  { id: 2, name: "小傑", need: "power" },
-  { id: 3, name: "阿華", need: "laptop" }
-];
-
-// 座位資料
-const seats = [
-  { id: "A1", type: "wall" },
-  { id: "A2", type: "wall" },
-  { id: "B1", type: "normal" },
-  { id: "B2", type: "normal" },
-  { id: "C1", type: "laptop" },
-  { id: "C2", type: "laptop" },
-  { id: "D1", type: "normal" },
-  { id: "D2", type: "normal" }
-];
-
-let remaining = [...students];
-
-/* ——— 生成學生卡片 ——— */
-function renderStudents() {
-  const box = document.getElementById("students");
-  box.innerHTML = "";
-  remaining.forEach(s => {
-    let div = document.createElement("div");
-    div.className = "student";
-    div.draggable = true;
-    div.id = "stu-" + s.id;
-    div.innerHTML = `<b>${s.name}</b><br>需求：${translateNeed(s.need)}`;
-    div.ondragstart = e => e.dataTransfer.setData("student", s.id);
-    box.appendChild(div);
-  });
-}
-
-/* ——— 生成座位 ——— */
-function renderSeats() {
-  const grid = document.getElementById("seatGrid");
-  seats.forEach(seat => {
-    let div = document.createElement("div");
-    div.className = "seat " + seat.type;
-    div.id = "seat-" + seat.id;
-    div.innerText = seat.id;
-
-    div.ondragover = e => e.preventDefault();
-    div.ondrop = e => handleDrop(e, seat);
-
-    grid.appendChild(div);
-  });
-}
-
-/* ——— 處理拖曳 ——— */
-function handleDrop(e, seat) {
-  const sid = e.dataTransfer.getData("student");
-  const student = remaining.find(s => s.id == sid);
-
-  if (!student) return;
-
-  let seatDiv = document.getElementById("seat-" + seat.id);
-
-  // 座位已有人
-  if (seatDiv.classList.contains("occupied")) {
-    showMsg("❌ 這個座位已經有人囉！");
-    return;
-  }
-
-  // 插座需求 → 必須 wall 或 laptop
-  if (student.need === "power" && seat.type !== "wall" && seat.type !== "laptop") {
-    showMsg("⚡ 這位學生需要插座，只能坐靠牆或筆電區！");
-    return;
-  }
-
-  // 筆電區需求
-  if (student.need === "laptop" && seat.type !== "laptop") {
-    showMsg("💻 這位學生只能坐筆電區！");
-    return;
-  }
-
-  // 正確放置
-  seatDiv.classList.add("occupied");
-  seatDiv.innerText = `${seat.id}\n（${student.name}）`;
-
-  remaining = remaining.filter(s => s.id != sid);
-  document.getElementById("stu-" + sid).remove();
-
-  if (remaining.length === 0) {
-    showMsg("🎉 全部學生都安排完成！你通過三樓閱覽席考驗！");
-  } else {
-    showMsg("✔ 安排成功！繼續協助其他學生～");
-  }
-}
-
-/* ——— 顯示提示 ——— */
-function showMsg(txt) {
-  document.getElementById("msg").innerText = txt;
-}
-
-/* ——— 翻譯需求名稱 ——— */
-function translateNeed(n) {
-  return {
-    power: "插座",
-    laptop: "筆電區",
-    normal: "一般座位"
-  }[n];
-}
-
-/* ——— 初始化 ——— */
-renderStudents();
-renderSeats();
-</script>
 
 </body>
 </html>
