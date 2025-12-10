@@ -112,7 +112,7 @@ body {
 
     <div class="desc-box">
       <h3>東野圭吾</h3>
-      <p>小明是東野圭吾的超級粉絲，請問他的書在第幾層樓呢?</p>
+      <p>小明是東野圭吾的超級粉絲，請問他的書在大部分都放在第幾層樓呢?</p>
     </div>
   </div>
 
@@ -175,6 +175,11 @@ function goToQ2() {
     let text = btn.innerText;
     btn.setAttribute("onclick", `checkAnswer(2,'${text}')`);
   });
+
+  setTimeout(() => {
+      window.location.href = "borrow2.html";
+    }, 1200);
+  
 }
 </script>
 
