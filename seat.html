@@ -141,45 +141,7 @@ renderStudents();
 document.querySelectorAll(".seat-zone").forEach(zone=>{
   zone.addEventListener("dragover", e => e.preventDefault());
 
-zone.addEventListener("drop", e=>{
-  e.preventDefault();
-
-  const groupId = e.dataTransfer.getData("group");
-  const card = document.getElementById("group-"+groupId);
-  if(!card) return;
-
-  /* 座位已被占用 */
-  if(zone.classList.contains("occupied")) {
-    showMsg("❌ 這個座位已經被選走了！");
-    return;
-  }
-
-  /* 座位是否允許該組 */
-  const allowed = zone.dataset.allow;
-  if(!allowed.includes(groupId)) {
-    showMsg("❌ 這組不能坐這個座位！");
-    return;
-  }
-
-  /* ⭐ 自動佔用座位 + 連動座位 */
-  occupySeat(zone);
-
-  card.remove();
-  remainingGroups = remainingGroups.filter(x => x != groupId);
-
-  showMsg("✔ 組 " + groupId + " 安排成功！");
-
-  /* 全部完成 */
-  if(remainingGroups.length === 0){
-    showMsg("🎉 全部分組成功安排座位！");
-    setTimeout(()=>{
-      window.location.href = "npc_question_page.html";
-    }, 1800);
-  }
-});
-
-  
-    }
+zone.addEventListener("drop", e=>{ e.preventDefault(); const groupId = e.dataTransfer.getData("group"); const card = document.getElementById("group-"+groupId); if(!card) return; /* 座位已被占用 */ if(zone.classList.contains("occupied")) { showMsg("❌ 這個座位已經被選走了！"); return; } /* 座位是否允許該組 */ const allowed = zone.dataset.allow; if(!allowed.includes(groupId)) { showMsg("❌ 這組不能坐這個座位！"); return; } /* 成功放置 */ zone.classList.add("occupied"); card.remove(); remainingGroups = remainingGroups.filter(x => x != groupId); showMsg("✔ 組 " + groupId + " 安排成功！"); /* 全部分組完成 */ if(remainingGroups.length === 0){ showMsg("🎉 全部分組成功安排座位！"); setTimeout(()=>{ window.location.href = "npc_question_page.html"; }, 1800); } }); });
  
 
 // 顯示訊息
