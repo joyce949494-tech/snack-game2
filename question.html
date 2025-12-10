@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<title>處理學生問題</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root{--page:#f7f9ff;--card:#ffffff;--accent:#1976d2;--ok:#28a745}
+  body{font-family:"Microsoft JhengHei",sans-serif;background:var(--page);margin:0;padding:18px;color:#222}
+  .wrap{max-width:900px;margin:22px auto;background:var(--card);border-radius:12px;padding:18px;box-shadow:0 8px 26px rgba(0,0,0,0.08)}
+  header{display:flex;align-items:center;justify-content:space-between}
+  h2{margin:0;font-size:20px}
+  .layout{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px}
+  .left{flex:1 1 320px}
+  .right{flex:1 1 320px}
+  .student-card{display:flex;align-items:center;gap:14px;padding:12px;border-radius:10px;background:#f3f7ff}
+  .student-card img{width:92px;height:92px;border-radius:10px;object-fit:cover}
+  .question-box{margin-top:12px;padding:12px;border-radius:10px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+  .choices{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .choice-btn{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:600}
+  .choice-btn.warn{background:#f57c00}
+  .choice-btn.gray{background:#616161}
+  .next-btn{display:inline-block;margin-top:12px;padding:10px 14px;border-radius:10px;border:none;background:var(--ok);color:#fff;cursor:pointer}
+  .msg{margin-top:12px;color:#333}
+  .timetable{width:100%;border-radius:10px;object-fit:cover}
+  .small{font-size:13px;color:#666;margin-top:6px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h2>處理學生問題</h2>
+      <div><button onclick="goBack()" style="padding:8px 12px;border-radius:8px;border:none;background:#9e9e9e;color:white;cursor:pointer">❮ 回主畫面</button></div>
+    </header>
+
+    <div id="content" class="layout">
+      <!-- left: student -->
+      <div class="left">
+        <div id="studentArea" class="student-card">
+          <!-- student info injected here -->
+        </div>
+
+        <div id="qbox" class="question-box">
+          <!-- question injected here -->
+        </div>
+
+        <div id="msg" class="msg"></div>
+      </div>
+
+      <!-- right: timetable / info (你會放截圖) -->
+      <div class="right">
+        <div style="font-weight:700">預約現況表（右側為你上傳的截圖）</div>
+        <img id="timetable" class="timetable" src="https://i.imgur.com/3fJ1P0M.png" alt="timetable placeholder">
+        <div class="small">提示：請點選主畫面中「在新分頁開啟館藏查詢」或此處圖片做判斷（此為示意圖）。</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* 讀取 query string 的 student id */
+function param(name){
+  const url = new URL(window.location.href);
+  return url.searchParams.get(name);
+}
+const sid = param('student'); 
+if(!sid){
+  alert('未指定學生，返回主畫面');
+  window.location.href = 'students.html';
+}
+
+// students info 與題型對應（固定）
+const studentsInfo = {
+  student1:{name:'小華', img:'https://i.imgur.com/1qfQ7ZC.png', type:'people'},
+  student2:{name:'小美', img:'https://i.imgur.com/8Km9tLL.png', type:'timetable'},
+  student3:{name:'小強', img:'https://i.imgur.com/Am1hY2K.png', type:'idcard'},
+  student4:{name:'小君', img:'https://i.imgur.com/3G2QZ4k.png', type:'late'},
+  student5:{name:'小潔', img:'https://i.imgur.com/oCkEbrA.png', type:'drink'}
+};
+
+// helper: mark solved and return to main
+const STORE_KEY = 'discuss_solved_students';
+function markSolved(id){
+  const arr = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+  if(!arr.includes(id)){ arr.push(id); localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }
+}
+
+// render student card
+const info = studentsInfo[sid];
+const studentArea = document.getElementById('studentArea');
+studentArea.innerHTML = `<img src="${info.img}" alt=""><div><div style="font-weight:700">${info.name}</div><div class="small">來問問題中</div></div>`;
+
+// generate question content based on type
+const qbox = document.getElementById('qbox');
+const msg = document.getElementById('msg');
+
+if(info.type === 'people'){
+  // 隨機人數 1-7
+  const people = Math.floor(Math.random()*7)+1;
+  qbox.innerHTML = `<div style="font-weight:700">問題：我們 ${people} 人，可以借討論室嗎？</div>
+    <div class="small">（規則：討論室人數限制 3–5 人）</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answerPeople(${people},true)">是</button>
+      <button class="choice-btn gray" onclick="answerPeople(${people},false)">否</button>
+    </div>`;
+}
+else if(info.type === 'timetable'){
+  // 範例題 — 你可以換成根據你上傳的截圖出題
+  // 這裡把正確答案設成 "D2"（示例），你後續可改
+  qbox.innerHTML = `<div style="font-weight:700">問題：我們 4 人想預約 15:00–17:00，哪一間可以使用？</div>
+    <div class="small">請參考右側現況表（示意圖），並選擇：</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answerTimetable('D1')">D1</button>
+      <button class="choice-btn" onclick="answerTimetable('D2')">D2</button>
+      <button class="choice-btn gray" onclick="answerTimetable('none')">都不行</button>
+    </div>`;
+}
+else if(info.type === 'idcard'){
+  qbox.innerHTML = `<div style="font-weight:700">問題：我忘記帶學生證，可以借討論室嗎？</div>
+    <div class="small">（規則：借用需出示學生證）</div>
+    <div class="choices">
+      <button class="choice-btn gray" onclick="answerIdcard(false)">否，我沒帶</button>
+      <button class="choice-btn warn" onclick="answerIdcard(true)">是，我想先進去</button>
+    </div>`;
+}
+else if(info.type === 'late'){
+  qbox.innerHTML = `<div style="font-weight:700">問題：我預約 10:00–12:00，但我 10:30 才到，還能使用嗎？</div>
+    <div class="small">（一般處理：允許短時間延遲到場，但可能需縮短使用時間）</div>
+    <div class="choices">
+      <button class="choice-btn" onclick="answerLate(true)">可以（但可能縮短）</button>
+      <button class="choice-btn gray" onclick="answerLate(false)">不行，取消預約</button>
+    </div>`;
+}
+else if(info.type === 'drink'){
+  qbox.innerHTML = `<div style="font-weight:700">問題：可以帶飲料進討論室嗎？</div>
+    <div class="small">（規則：討論室禁止飲食以維持安靜與清潔）</div>
+    <div class="choices">
+      <button class="choice-btn gray" onclick="answerDrink(true)">可以</button>
+      <button class="choice-btn warn" onclick="answerDrink(false)">不可以</button>
+    </div>`;
+}
+
+// 處理答案：人數
+function answerPeople(num, pickedYes){
+  // 正確答案是「可借」當 num >=3 && num <=5
+  const correct = (num >=3 && num <=5);
+  const userSaysYes = pickedYes;
+  if(userSaysYes === correct){
+    msg.innerText = '✅ 回答正確！處理完成，回到主畫面。';
+    markSolved(sid);
+    setTimeout(()=>{ window.location.href='students.html'; },900);
+  } else {
+    msg.innerText = '❌ 回答不正確，提示：討論室需 3–5 人。';
+  }
+}
+
+// 時段判定（示例判定）
+// 這裡把正確答案示為 'D2' —— 你上傳的預約現況圖若不同，請修改此判定。
+function answerTimetable(choice){
+  const correct = 'D2';
+  if(choice === correct){
+    msg.innerText = '✅ 找到可用討論室，預約成功！';
+    markSolved(sid);
+    setTimeout(()=>{ window.location.href='students.html'; },900);
+  } else {
+    msg.innerText = '❌ 無法使用，請檢查現況表或選其他時段/房間。';
+  }
+}
+
+// 學生證題：正確為「不能借」
+function answerIdcard(wantsToEnter){
+  const correct = false;
+  if(wantsToEnter === correct){
+    msg.innerText='✅ 正確：需出示學生證才可借用。';
+    markSolved(sid);
+    setTimeout(()=>{ window.location.href='students.html'; },900);
+  } else {
+    msg.innerText='❌ 錯誤：沒有學生證無法借用。';
+  }
+}
+
+// 遲到題（我們把 "true" 當正確）
+function answerLate(ok){
+  const correct = true;
+  if(ok === correct){
+    msg.innerText='✅ 處理完成：允許短時間遲到，但請縮短使用時間。';
+    markSolved(sid);
+    setTimeout(()=>{ window.location.href='students.html'; },900);
+  } else {
+    msg.innerText='❌ 此方案會取消預約，若確定請再次與櫃檯確認。';
+  }
+}
+
+// 飲料題（正確為 false）
+function answerDrink(can){
+  const correct = false;
+  if(can === correct){
+    msg.innerText='✅ 正確：討論室禁止飲食。';
+    markSolved(sid);
+    setTimeout(()=>{ window.location.href='students.html'; },900);
+  } else {
+    msg.innerText='❌ 錯誤：飲料會影響他人，請勿帶入。';
+  }
+}
+
+function goBack(){ window.location.href='students.html'; }
+</script>
+</body>
+</html>
