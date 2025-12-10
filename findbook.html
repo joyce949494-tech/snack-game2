@@ -158,6 +158,7 @@ function checkAnswer(questionNumber, selectedFloor) {
   if (questionNumber === 2) {
     if (selectedFloor === answers.q2) {
       alert("✔️太棒了！全部答對！");
+      window.location.href = "findbook2.html";
     } else {
       alert("❌不正確喔～再試看看！");
     }
@@ -175,11 +176,6 @@ function goToQ2() {
     let text = btn.innerText;
     btn.setAttribute("onclick", `checkAnswer(2,'${text}')`);
   });
-
-  setTimeout(() => {
-      window.location.href = "borrow2.html";
-    }, 1200);
-  
 }
 </script>
 
