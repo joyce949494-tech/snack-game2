@@ -44,7 +44,7 @@ body {
 
 .npc-img {
   width: 100px;
-  border-radius: 50%;
+  border-radius: 100%;
 }
 
 .npc-name {
@@ -117,32 +117,34 @@ body {
 const questions = [
   {
     id: 1,
-    img: "https://i.imgur.com/7Wf4YIz.png",
-    name: "小美",
-    title: "人數判定",
+    img: "https://i.imgur.com/IaTyfvD.png",
+    name: "我是小美",
+    title: "小美問：",
     desc: "我們有 2 個人，可以借用討論室嗎？",
     choices: [
       {text: "可以", correct: false},
-      {text: "不行，需要至少 3 人", correct: true}
+      {text: "不行，人數限制 3~5 人喔", correct: true}
     ]
   },
   {
     id: 2,
-    img: "https://i.imgur.com/7Wf4YIz.png",
-    name: "小華",
-    title: "時段判斷",
-    desc: "我想預約 13:00–15:00，有空的討論室嗎？(請查看預約表)",
+    img: "https://i.imgur.com/TXbmO6l.png",
+    name: "太陽餅",
+    title: "太陽餅問：",
+    desc: "我和朋友想預約 10:00–12:00，我可以選哪間討論小間？(請查看預約表)",
     choices: [
-      {text: "有，這時段是空的", correct: true},
-      {text: "沒有，都滿了", correct: false}
+      {text: "D01", correct: false}
+      {text: "D02", correct: true},
+      {text: "D03", correct: false}
+      {text: "D04", correct: false}
     ],
     showSchedule: true
   },
   {
     id: 3,
-    img: "https://i.imgur.com/7Wf4YIz.png",
-    name: "小明",
-    title: "遲到問題",
+    img: "https://i.imgur.com/MlustBH.png",
+    name: "乒乓乒乓球",
+    title: "乒乓乒乓球問：",
     desc: "我預約 10:00–12:00，但我 10:30 才到，還能使用嗎？",
     choices: [
       {text: "可以，只要時段內都能使用", correct: false},
@@ -151,9 +153,9 @@ const questions = [
   },
   {
     id: 4,
-    img: "https://i.imgur.com/7Wf4YIz.png",
-    name: "小美2",
-    title: "飲料問題",
+    img: "https://i.imgur.com/nBSxIyr.png",
+    name: "傳說中的小明",
+    title: "傳說中的小明問：",
     desc: "我可以拿飲料進去討論室嗎？",
     choices: [
       {text: "可以", correct: false},
@@ -162,10 +164,10 @@ const questions = [
   },
   {
     id: 5,
-    img: "https://i.imgur.com/7Wf4YIz.png",
-    name: "小強",
-    title: "借用時間",
-    desc: "討論室一次最多能借用多久呢？",
+    img: "https://i.imgur.com/X5B5GCb.png",
+    name: "黑道猩猩",
+    title: "黑道猩猩問：",
+    desc: "喂~ 討論室一次最多能借用多久？",
     choices: [
       {text: "1 小時", correct: false},
       {text: "2 小時", correct: true}
@@ -182,7 +184,7 @@ function renderNPCs() {
 
   if (remaining.length === 0) {
     // 全部完成，跳轉結算頁面
-    window.location.href = "pass.html"; // 這裡改成你的完成頁面
+    window.location.href = "student2.html"; // 這裡改成你的完成頁面
     return;
   }
 
@@ -239,7 +241,7 @@ function openQuestion(id) {
 
 // ---------- 4️⃣ 選項判定 ----------
 function checkAnswer(id, isCorrect) {
-  alert(isCorrect ? "✔ 答對了！" : "✘ 再想想～");
+  alert(isCorrect ? "✔ 答對了！學生滿意的離開了" : "✘ 哇...想一下等等再回～");
 
   if (isCorrect) {
     remaining = remaining.filter(x => x.id !== id);
