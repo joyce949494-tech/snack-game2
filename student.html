@@ -1,123 +1,234 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8" />
-<title>討論室櫃台任務 — 主畫面</title>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<title>討論室任務挑戰</title>
+
 <style>
-  :root{
-    --card-bg:#ffffff; --page-bg:#eef5ff;
-    --accent:#1976d2; --accent-2:#7b1fa2; --ok:#28a745;
-  }
-  body{font-family:"Microsoft JhengHei",sans-serif;background:var(--page-bg);margin:0;padding:24px;color:#222}
-  .wrap{max-width:1100px;margin:0 auto;background:var(--card-bg);border-radius:14px;padding:18px 22px;box-shadow:0 10px 30px rgba(0,0,0,0.08)}
-  h1{margin:0 0 10px;font-size:22px}
-  p.lead{margin:0 0 18px;color:#444}
-  .students-grid{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding:8px}
-  .student{
-    width:170px; text-align:center; background:#fff; border-radius:12px; padding:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06);
-    position:relative; cursor:pointer; transition:transform .14s;
-  }
-  .student:hover{transform:translateY(-6px)}
-  .student img{width:120px;height:120px;object-fit:cover;border-radius:50%;border:4px solid #f3f7ff}
-  .student .name{margin-top:8px;font-weight:600}
-  .student .bubble{position:absolute;left:12px;top:8px;background:var(--accent);color:#fff;padding:6px 10px;border-radius:10px;font-size:13px}
-  .controls{display:flex;gap:10px;justify-content:center;margin-top:18px}
-  .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
-  .btn.reset{background:#f57c00;color:#fff}
-  .btn.clear{background:#9e9e9e;color:#fff}
-  .hint{margin-top:12px;color:#666;text-align:center}
-  .empty{color:#999;font-size:15px;padding:26px}
-  /* 消失效果 */
-  .hidden{display:none !important}
+body {
+  font-family: "Microsoft JhengHei", sans-serif;
+  background: #f0f6ff;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+/* 主容器 */
+.container {
+  width: 90%;
+  margin: auto;
+  padding-top: 20px;
+}
+
+/* NPC 區：使用 random 排列 */
+.npc-area {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  margin-top: 20px;
+}
+
+/* 個別 NPC 圖示 */
+.npc {
+  width: 120px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.npc:hover {
+  transform: scale(1.08);
+}
+
+/* 題目跳出視窗 */
+.question-box {
+  width: 90%;
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  display: none;
+}
+
+.choice-btn {
+  background: #4a89e8;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  margin: 10px;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.choice-btn:hover {
+  background: #3569c9;
+}
+
+/* 預約表（只在第2題會出現） */
+.schedule-img {
+  width: 90%;
+  max-width: 400px;
+  border-radius: 10px;
+  margin: 15px auto;
+  display: none;
+}
 </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <h1>討論室櫃台任務</h1>
-    <p class="lead">你是櫃檯人員 — 5 位同學會來詢問問題，點一位學生處理他的需求。答對之後該學生會從畫面消失。</p>
 
-    <div id="students" class="students-grid"></div>
+<div class="container">
+  <h2>📚 討論室諮詢中心</h2>
+  <p>請點擊任一位學生，幫助他們解決問題！</p>
 
-    <div class="controls">
-      <button class="btn reset" id="resetBtn">🔁 重置進度</button>
-      <button class="btn clear" id="goToLib">🔍 開啟館藏查詢（新分頁）</button>
-    </div>
+  <!-- NPC 區（JS 會隨機排序） -->
+  <div id="npcArea" class="npc-area"></div>
+</div>
 
-    <p class="hint">提示：點其中一個學生即可開始處理他的問題。</p>
-  </div>
+<!-- 題目盒子 -->
+<div id="questionBox" class="question-box">
+  <h3 id="qTitle"></h3>
+  <p id="qDesc"></p>
+
+  <!-- 專屬第 2 題的預約表 -->
+  <img id="scheduleImg" class="schedule-img"
+       src="https://i.imgur.com/6G8H3wQ.jpeg">
+
+  <div id="choices"></div>
+</div>
 
 <script>
-/*
-  五位學生固定題型對應：
-  student1: 人數判斷題（人數隨機 1–7，每次點選該題會重新隨機）
-  student2: 時段判斷題（使用者檢視你上傳的預約現況截圖，範例此處使用占位圖）
-  student3: 學生證題（忘帶學生證能借？）
-  student4: 遲到題（預約 10:00–12:00，10:30 才到能用？）
-  student5: 飲料題（能否帶飲料入討論室？）
-*/
-
-const studentsData = [
-  { id: 'student1', name:'小華', img:'https://i.imgur.com/1qfQ7ZC.png' },
-  { id: 'student2', name:'小美', img:'https://i.imgur.com/8Km9tLL.png' },
-  { id: 'student3', name:'小強', img:'https://i.imgur.com/Am1hY2K.png' },
-  { id: 'student4', name:'小君', img:'https://i.imgur.com/3G2QZ4k.png' },
-  { id: 'student5', name:'小潔', img:'https://i.imgur.com/oCkEbrA.png' }
+// ---------- 1️⃣ 題庫設定 ----------
+const questions = [
+  {
+    id: 1,
+    img: "https://i.imgur.com/7Wf4YIz.png", // 暫時 NPC 圖
+    title: "人數判定",
+    desc: "我們有 2 個人，可以借用討論室嗎？",
+    choices: [
+      {text: "可以", correct: false},
+      {text: "不行，需要至少 3 人", correct: true}
+    ]
+  },
+  {
+    id: 2,
+    img: "https://i.imgur.com/7Wf4YIz.png",
+    title: "時段判斷",
+    desc: "我想預約 13:00–15:00，有空的討論室嗎？(請查看預約表)",
+    choices: [
+      {text: "有，這時段是空的", correct: true},
+      {text: "沒有，都滿了", correct: false}
+    ],
+    showSchedule: true
+  },
+  {
+    id: 3,
+    img: "https://i.imgur.com/7Wf4YIz.png",
+    title: "遲到問題",
+    desc: "我預約 10:00–12:00，但我 10:30 才到，還能使用嗎？",
+    choices: [
+      {text: "可以，只要時段內都能使用", correct: false},
+      {text: "超過 15 分鐘未報到會取消，不能用了", correct: true}
+    ]
+  },
+  {
+    id: 4,
+    img: "https://i.imgur.com/7Wf4YIz.png",
+    title: "飲料問題",
+    desc: "我可以拿飲料進去討論室嗎？",
+    choices: [
+      {text: "可以", correct: false},
+      {text: "不行，討論室禁止飲食", correct: true}
+    ]
+  },
+  {
+    id: 5,
+    img: "https://i.imgur.com/7Wf4YIz.png",
+    title: "借用時間",
+    desc: "討論室一次最多能借用多久呢？",
+    choices: [
+      {text: "1 小時", correct: false},
+      {text: "2 小時", correct: true}
+    ]
+  }
 ];
 
-// localStorage key
-const STORE_KEY = 'discuss_solved_students';
+let remaining = [...questions]; // 尚未解決的 NPC
 
-function readSolved(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }catch(e){return [];} }
-function saveSolved(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }
+// ---------- 2️⃣ 主畫面 NPC 生成（含隨機排序） ----------
+function renderNPCs() {
+  const area = document.getElementById("npcArea");
+  area.innerHTML = "";
 
-const container = document.getElementById('students');
+  // 隨機排序
+  const shuffled = [...remaining].sort(() => Math.random() - 0.5);
 
-function renderStudents(){
-  container.innerHTML = '';
-  const solved = readSolved();
-
-  // if all solved show message
-  if(solved.length >= studentsData.length){
-    container.innerHTML = '<div class="empty">🎉 全部學生的問題都處理完了！</div>';
-    return;
-  }
-
-  studentsData.forEach(s => {
-    if(solved.includes(s.id)) return; // skip solved
-
-    const el = document.createElement('div');
-    el.className = 'student';
-    el.innerHTML = `
-      <div class="bubble">詢問</div>
-      <img src="${s.img}" alt="${s.name}">
-      <div class="name">${s.name}</div>
-      <div style="font-size:13px;color:#666;margin-top:6px">點我處理問題</div>
-    `;
-    el.onclick = () => startQuestion(s.id);
-    container.appendChild(el);
+  shuffled.forEach(q => {
+    let npc = document.createElement("img");
+    npc.src = q.img;
+    npc.className = "npc";
+    npc.onclick = () => openQuestion(q.id);
+    area.appendChild(npc);
   });
 }
 
-function startQuestion(studentId){
-  // 導到 question.html，並把 studentId 和（若需要）隨機人數放到 localStorage 或 query string
-  // 我用 query string 更直觀
-  // 人數題會在 question.html 每次生成隨機數
-  window.location.href = `question.html?student=${studentId}`;
+renderNPCs();
+
+
+// ---------- 3️⃣ 顯示題目 ----------
+function openQuestion(id) {
+  const q = remaining.find(x => x.id === id);
+  if (!q) return;
+
+  document.getElementById("npcArea").style.display = "none";
+
+  const box = document.getElementById("questionBox");
+  box.style.display = "block";
+
+  document.getElementById("qTitle").innerText = q.title;
+  document.getElementById("qDesc").innerText = q.desc;
+
+  // 顯示或隱藏預約表
+  document.getElementById("scheduleImg").style.display =
+    q.showSchedule ? "block" : "none";
+
+  let choiceBox = document.getElementById("choices");
+  choiceBox.innerHTML = "";
+
+  q.choices.forEach(c => {
+    let btn = document.createElement("button");
+    btn.className = "choice-btn";
+    btn.innerText = c.text;
+    btn.onclick = () => checkAnswer(id, c.correct);
+    choiceBox.appendChild(btn);
+  });
 }
 
-document.getElementById('resetBtn').onclick = function(){
-  if(confirm('確認要重置進度？所有已解決的學生會重新出現。')){
-    localStorage.removeItem(STORE_KEY);
-    renderStudents();
+
+// ---------- 4️⃣ 選項判定 ----------
+function checkAnswer(id, isCorrect) {
+  alert(isCorrect ? "✔ 答對了！" : "✘ 再想想～");
+
+  if (isCorrect) {
+    // 刪除該 NPC
+    remaining = remaining.filter(x => x.id !== id);
   }
-};
 
-document.getElementById('goToLib').onclick = function(){
-  window.open('https://sierra.lib.ntust.edu.tw/*cht','_blank');
-};
+  // 回主畫面
+  backToMain();
+}
 
-renderStudents();
+
+// ---------- 5️⃣ 回到主畫面 ----------
+function backToMain() {
+  document.getElementById("questionBox").style.display = "none";
+  document.getElementById("npcArea").style.display = "flex";
+  renderNPCs();
+}
 </script>
+
 </body>
 </html>
