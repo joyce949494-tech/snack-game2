@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>三樓閱覽席｜分配座位遊戲</title>
+<title>三樓閱覽席｜分組選位遊戲</title>
 
 <style>
 body {
@@ -12,20 +12,22 @@ body {
   padding: 20px;
 }
 
-/* ——— 學生卡片 ——— */
-.student {
-  width: 120px;
-  padding: 12px;
+/* 學生卡片 */
+.group {
+  width: 140px;
+  padding: 15px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 0 8px rgba(0,0,0,0.15);
   margin: 10px;
   cursor: grab;
 }
+.group:active { cursor: grabbing; }
 
-.map, #qaSection {
+/* 座位地圖外框 */
+.map {
   width: 80%;
-  max-width: 700px;
+  max-width: 850px;
   margin: 25px auto;
   padding: 20px;
   background: white;
@@ -33,51 +35,40 @@ body {
   box-shadow: 0 0 15px rgba(0,0,0,0.1);
 }
 
-/* ——— 座位地圖布局 ——— */
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
   margin-top: 20px;
 }
 
-/* ——— 座位格子 ——— */
+/* 座位樣式 */
 .seat {
-  width: 90px;
-  height: 90px;
+  width: 95px;
+  height: 95px;
   border-radius: 12px;
   background: #dbe8ff;
   display: flex;
   justify-content: center;
   align-items: center;
   font-weight: bold;
-  text-align: center;
-  white-space: pre-line;
+  transition: 0.2s;
 }
 
-.seat.wall { background: #b4d4ff; }
-.seat.laptop { background: #ffcfa9; }
-.seat.occupied { background: #888; color: white; }
+.seat.available { background: #2e3a4d; color: white; }
+.seat.temp { background: #ffcc33; }
+.seat.disabled { background: #e5e5e5; color: #aaa; }
+.seat.chosen { background: white; color: #444; border: 2px solid #2e3a4d; }
 
-/* ——— Q&A 按鈕 ——— */
-.qaBtn {
-  padding: 12px 20px;
-  margin: 10px;
-  background: #4e8aff;
+.seat.filled {
+  background: #4a7fe8;
   color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
 }
 
-.qaBtn:hover {
-  background: #336dff;
-}
-
+/* 訊息 */
 #msg {
-  margin-top: 20px;
-  font-size: 20px;
+  margin-top: 25px;
+  font-size: 22px;
   font-weight: bold;
   color: #444;
 }
@@ -86,204 +77,146 @@ body {
 
 <body>
 
-<h2>🔌 三樓閱覽席｜替學生分配座位</h2>
-<p id="topText">拖曳學生 → 放到最適合他的座位。</p>
+<h2>🔷 三樓閱覽席分組選位</h2>
+<p>請將每組拖移到正確的座位區。</p>
 
-<!-- 學生列表 -->
-<div id="students" style="display:flex; justify-content:center; flex-wrap:wrap;"></div>
+<!-- 學生分組 -->
+<div id="groups" style="display:flex; justify-content:center; flex-wrap:wrap;"></div>
 
 <!-- 座位地圖 -->
-<div class="map" id="seatMap">
-  <h3>三樓座位平面圖</h3>
+<div class="map">
+  <h3>可選座位區</h3>
   <div class="grid" id="seatGrid"></div>
-</div>
-
-<!-- NPC 問答 區塊 -->
-<div id="qaSection" style="display:none;">
-  <h3>📚 NPC 使用問題</h3>
-  <p id="qaQuestion" style="font-size:18px; font-weight:bold;"></p>
-
-  <div id="qaButtons"></div>
-  <p id="qaMsg" style="color:#444; font-size:18px; margin-top:10px;"></p>
 </div>
 
 <p id="msg"></p>
 
 <script>
-/* ————————————————
-    座位遊戲資料
-——————————————— */
-const students = [
-  { id: 1, name: "小美", need: "normal" },
-  { id: 2, name: "小傑", need: "power" },
-  { id: 3, name: "阿華", need: "laptop" }
+// ---------------------------------------
+// 分組設定
+// ---------------------------------------
+const groups = [
+  { id: "A", size: 3, seats: [] },
+  { id: "B", size: 2, seats: [] },
+  { id: "C", size: 2, seats: [] },
+  { id: "D", size: 1, seats: [] }
 ];
 
+// 解答（唯一正解）
+const correct = {
+  A: ["121", "122", "123"],
+  B: ["113", "114"],
+  C: ["129", "130"],
+  D: ["093"] // D 組可以彈性，但這裡先固定為 093
+};
+
+// ---------------------------------------
+// 座位資料
+// ---------------------------------------
 const seats = [
-  { id: "A1", type: "wall" },
-  { id: "A2", type: "wall" },
-  { id: "B1", type: "normal" },
-  { id: "B2", type: "normal" },
-  { id: "C1", type: "laptop" },
-  { id: "C2", type: "laptop" },
-  { id: "D1", type: "normal" },
-  { id: "D2", type: "normal" }
+  "093","098","105","125","129","130",
+  "113","114","121","122","123"
 ];
 
-let remaining = [...students];
-
-/* ————————————————
-    NPC 問答資料
-——————————————— */
-let qaIndex = 0;
-
-const qaList = [
-  {
-    q: "我借位後都沒回來，多久會被取消？",
-    options: ["30 分鐘", "1 小時", "2 小時（離館超過會取消）"],
-    answer: 2
-  },
-  {
-    q: "哪些座位有插座？",
-    options: ["全部座位都有", "靠牆座位與筆電區", "只有筆電區"],
-    answer: 1
-  }
-];
-
-/* ————————————————
-    DOM 建立
-——————————————— */
-function renderStudents() {
-  const box = document.getElementById("students");
+// ---------------------------------------
+// 產生分組卡片
+// ---------------------------------------
+function renderGroups(){
+  const box = document.getElementById("groups");
   box.innerHTML = "";
-  remaining.forEach(s => {
-    let div = document.createElement("div");
-    div.className = "student";
+  groups.forEach(g=>{
+    const div = document.createElement("div");
+    div.className = "group";
+    div.id = "group-" + g.id;
     div.draggable = true;
-    div.id = "stu-" + s.id;
-    div.innerHTML = `<b>${s.name}</b><br>需求：${translateNeed(s.need)}`;
-    div.ondragstart = e => e.dataTransfer.setData("student", s.id);
+    div.ondragstart = e => e.dataTransfer.setData("group", g.id);
+    div.innerHTML = `<b>${g.id} 組</b><br>(${g.size} 人)`;
     box.appendChild(div);
   });
 }
 
-function renderSeats() {
+// ---------------------------------------
+// 生成可選座位
+// ---------------------------------------
+function renderSeats(){
   const grid = document.getElementById("seatGrid");
-  seats.forEach(seat => {
-    let div = document.createElement("div");
-    div.className = "seat " + seat.type;
-    div.id = "seat-" + seat.id;
-    div.innerText = seat.id;
+  seats.forEach(id=>{
+    const div = document.createElement("div");
+    div.className = "seat available";
+    div.id = "seat-" + id;
+    div.innerText = id;
 
     div.ondragover = e => e.preventDefault();
-    div.ondrop = e => handleDrop(e, seat);
+    div.ondrop = e => handleDrop(e, id);
 
     grid.appendChild(div);
   });
 }
 
-/* ————————————————
-    處理拖曳
-——————————————— */
-function handleDrop(e, seat) {
-  const sid = e.dataTransfer.getData("student");
-  const student = remaining.find(s => s.id == sid);
-  if (!student) return;
+// ---------------------------------------
+// 處理放置
+// ---------------------------------------
+function handleDrop(e, seatID){
+  const gid = e.dataTransfer.getData("group");
+  const group = groups.find(g => g.id === gid);
 
-  let seatDiv = document.getElementById("seat-" + seat.id);
-
-  if (seatDiv.classList.contains("occupied")) {
-    showMsg("❌ 這個座位已經有人囉！");
+  if(!group || group.seats.length >= group.size){
+    showMsg("❌ 這組的人數已經放滿了！");
     return;
   }
 
-  if (student.need === "power" && seat.type !== "wall" && seat.type !== "laptop") {
-    showMsg("⚡ 這位學生需要插座，只能坐靠牆或筆電區！");
+  const seatDiv = document.getElementById("seat-" + seatID);
+
+  if(seatDiv.classList.contains("filled")){
+    showMsg("❌ 這個座位已被使用！");
     return;
   }
 
-  if (student.need === "laptop" && seat.type !== "laptop") {
-    showMsg("💻 這位學生只能坐筆電區！");
-    return;
-  }
+  // 放進去
+  seatDiv.classList.add("filled");
+  seatDiv.innerHTML = `${seatID}\n(${gid})`;
+  group.seats.push(seatID);
 
-  seatDiv.classList.add("occupied");
-  seatDiv.innerText = `${seat.id}\n（${student.name}）`;
-
-  remaining = remaining.filter(s => s.id != sid);
-  document.getElementById("stu-" + sid).remove();
-
-  if (remaining.length === 0) {
-    showMsg("");
-    startQA();  // ← 問答開始！
-  } else {
-    showMsg("✔ 安排成功！繼續協助其他學生～");
-  }
+  checkComplete();
 }
 
-/* ————————————————
-    NPC 問答模式
-——————————————— */
-function startQA() {
-  document.getElementById("students").style.display = "none";
-  document.getElementById("seatMap").style.display = "none";
-  document.getElementById("topText").style.display = "none";
+// ---------------------------------------
+// 檢查是否全部完成
+// ---------------------------------------
+function checkComplete(){
+  let allDone = groups.every(g => g.seats.length === g.size);
+  if(!allDone) return;
 
-  document.getElementById("qaSection").style.display = "block";
-  loadQuestion();
-}
-
-function loadQuestion() {
-  if (qaIndex >= qaList.length) {
-    document.getElementById("qaSection").innerHTML =
-      `<h2>🎉 你已通過三樓閱覽席考驗！</h2>`;
-    return;
-  }
-
-  const q = qaList[qaIndex];
-  document.getElementById("qaQuestion").innerText = q.q;
-
-  const btnBox = document.getElementById("qaButtons");
-  btnBox.innerHTML = "";
-
-  q.options.forEach((opt, i) => {
-    let btn = document.createElement("button");
-    btn.className = "qaBtn";
-    btn.innerText = opt;
-    btn.onclick = () => checkAnswer(i);
-    btnBox.appendChild(btn);
+  // 檢查是否正確
+  let ok = true;
+  groups.forEach(g=>{
+    let required = correct[g.id];
+    let placed = g.seats.sort();
+    if(required.sort().join("") !== placed.join("")){
+      ok = false;
+    }
   });
-}
 
-function checkAnswer(choice) {
-  const q = qaList[qaIndex];
-  const msg = document.getElementById("qaMsg");
+  if(ok){
+    showMsg("🎉 選位成功！即將進入下一階段…");
 
-  if (choice === q.answer) {
-    msg.innerText = "✔ 答對了！";
-    qaIndex++;
-    setTimeout(() => {
-      msg.innerText = "";
-      loadQuestion();
-    }, 700);
-  } else {
-    msg.innerText = "❌ 再想想看～";
+    // 延遲 2 秒跳轉
+    setTimeout(()=>{
+      window.location.href = "quiz.html"; // ← 修改成你的題目頁面
+    }, 2000);
+
+  }else{
+    showMsg("❌ 有組沒有放在正確的位置喔！");
   }
 }
 
-/* ————————————————
-    工具
-——————————————— */
-function showMsg(t) { document.getElementById("msg").innerText = t; }
-
-function translateNeed(n) {
-  return { power: "插座", laptop: "筆電區", normal: "一般座位" }[n];
+// ---------------------------------------
+function showMsg(t){
+  document.getElementById("msg").innerText = t;
 }
 
-/* ————————————————
-    初始化
-——————————————— */
-renderStudents();
+// 初始化
+renderGroups();
 renderSeats();
 </script>
 
