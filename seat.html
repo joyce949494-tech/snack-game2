@@ -1,117 +1,296 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<title>三樓閱覽席 - 區塊示意圖</title>
+<meta charset="utf-8" />
+<title>三樓閱覽席 — 選位 + 問答</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    padding: 20px;
+  :root{
+    --bg:#f4f7fb;
+    --card:#fff;
+    --seat:#d9eaff;
+    --seat-border:#6b99c3;
+    --laptop:#c4f3d8;
+    --laptop-border:#4da56b;
+    --occupied:#333;
+    --text:#212121;
+    --accent:#1976d2;
+  }
+  body{
+    margin:0; padding:18px; font-family:"Microsoft JhengHei",sans-serif;
+    background:var(--bg); color:var(--text);
+  }
+  .wrap{max-width:1100px;margin:10px auto;}
+  h1{font-size:20px;margin:6px 0 12px}
+  p.lead{color:#555;margin:0 0 10px}
+  .board{
+    background:var(--card); border-radius:12px; padding:14px; box-shadow:0 10px 30px rgba(0,0,0,0.06);
   }
 
-  .map-container {
-    width: 700px;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  /* ------ seat map layout (grid) ------ */
+  .map{
+    display:grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap:10px;
+    align-items:start;
+    margin-top:12px;
   }
 
-  .section-title {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 10px;
+  .seat{
+    height:56px; border-radius:8px; background:var(--seat); border:1px solid var(--seat-border);
+    display:flex; align-items:center; justify-content:center; font-weight:700; color:#034;
+    cursor:pointer; user-select:none;
   }
+  .seat.small{ height:44px; font-size:13px }
+  .seat.laptop{ background:var(--laptop); border-color:var(--laptop-border) }
+  .seat.occupied{ background:var(--occupied); color:white; cursor:not-allowed; border-color:#000 }
+  .seat.selected{ outline:3px solid #ffb74d }
 
-  .room-layout {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: 8px;
-    margin-top: 20px;
-  }
+  /* spacing boxes for layout */
+  .sp{ background:transparent; border:none; pointer-events:none; }
 
-  .seat {
-    width: 50px;
-    height: 45px;
-    background: #d9eaff;       /* 一般座位 */
-    border-radius: 6px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-size: 12px;
-    border: 1px solid #6b99c3;
-  }
+  /* info area */
+  .info{ display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap }
+  .chip{ padding:6px 10px; background:#fff; border-radius:10px; box-shadow:0 5px 14px rgba(0,0,0,0.04) }
+  .msg{ margin-left:8px; font-weight:600; color:#333 }
 
-  .seat.laptop {
-    background: #c4ffd8;        /* 筆電區（有插座） */
-    border-color: #4da56b;
+  /* quiz area */
+  #quizArea{ display:none; margin-top:16px; }
+  .qa-card{ background:#fff; padding:18px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.06) }
+  .choices{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap }
+  .btn{
+    padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:700;
+    background:var(--accent); color:white;
   }
+  .btn.gray{ background:#777 }
+  .result{ margin-top:12px; font-weight:700; color:#333 }
 
-  .seat.occupied {
-    background: #333;
-    color: white;
-    border-color: #000;
-    cursor: not-allowed;
-  }
-
-  .stairs {
-    grid-column: span 2;
-    background: #eee;
-    border: 2px solid #aaa;
-    border-radius: 6px;
-    text-align: center;
-    padding-top: 12px;
-    font-size: 14px;
-    height: 80px;
-  }
-
-  .label {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #555;
-  }
+  /* pass screen */
+  #passScreen{ display:none; text-align:center; padding:30px; margin-top:12px }
+  .pass-badge{ font-size:26px; font-weight:800; color:#2e7d32 }
 </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <h1>三樓閱覽席 — 選位模擬</h1>
+    <p class="lead">請從下方選擇座位（綠色區塊為筆電區 105–136，灰黑為已有他人）。選好座位後系統會自動進入問答關卡。</p>
 
-<div class="map-container">
-  <div class="section-title">三樓閱覽席（左半區）</div>
+    <div class="board">
+      <!-- seat map (12 列 grid) -->
+      <div id="map" class="map"></div>
 
-  <!-- 座位圖 -->
-  <div class="room-layout">
+      <div class="info">
+        <div class="chip">筆電區：105–136（有插座）</div>
+        <div class="chip">已有人（不可選）：<span id="occupiedCount">0</span></div>
+        <div class="msg" id="statusMsg">尚未選位</div>
+      </div>
 
-    <div class="stairs">樓梯</div>
+      <!-- Quiz area -->
+      <div id="quizArea">
+        <div class="qa-card">
+          <div id="qTitle" style="font-weight:800"></div>
+          <div id="qBody" style="margin-top:8px;color:#444"></div>
+          <div class="choices" id="choices"></div>
+          <div class="result" id="qResult"></div>
+        </div>
+      </div>
 
-    <!-- 101–110 -->
-    <div class="seat">101</div>
-    <div class="seat occupied">102</div>
-    <div class="seat">103</div>
-    <div class="seat laptop">104</div>
-    <div class="seat laptop occupied">105</div>
-    <div class="seat laptop">106</div>
-    <div class="seat">107</div>
-    <div class="seat occupied">108</div>
-
-    <!-- 111–120 -->
-    <div class="seat laptop">111</div>
-    <div class="seat laptop">112</div>
-    <div class="seat laptop occupied">113</div>
-    <div class="seat laptop">114</div>
-    <div class="seat laptop">115</div>
-    <div class="seat laptop occupied">116</div>
-    <div class="seat laptop">117</div>
-    <div class="seat">118</div>
-    <div class="seat occupied">119</div>
-    <div class="seat">120</div>
-
+      <!-- Pass area -->
+      <div id="passScreen">
+        <div class="pass-badge">🎉 你已通過三樓閱覽席考驗</div>
+        <p style="margin-top:10px;color:#555">感謝你學習正確使用閱覽席的規範！</p>
+        <button class="btn" onclick="location.reload()">返回並重玩</button>
+      </div>
+    </div>
   </div>
 
-  <div class="label">🟦 一般座位　🟩 筆電區（有插座）　⬛ 已有人使用</div>
+<script>
+/* ---------- seat config ---------- */
+/* We'll render seats roughly matching the red-box area + surrounding general seats.
+   We'll define an ordered list of seat IDs and mark which are laptop seats (105-136).
+   For layout aesthetics we use empty grid placeholders (sp).
+*/
 
-</div>
+const laptopSeats = [];
+for(let n=105;n<=136;n++) laptopSeats.push(String(n));
 
+/* define all seat IDs we want to show (左半區重點 + 周邊一般座位)
+   For simplicity we create some general seats before and after laptop block.
+*/
+const seatOrder = [
+  // top row small general seats (arbitrary numbers left of laptop block)
+  '093','094','095','096','097','098','099','100','101','102','103','104',
+
+  // Laptop block top row 105-112
+  '105','106','107','108','109','110','111','112',
+  // row under: 113-120
+  '113','114','115','116','117','118','119','120',
+  // row under: 121-128
+  '121','122','123','124','125','126','127','128',
+  // row under: 129-136
+  '129','130','131','132','133','134','135','136',
+
+  // bottom row general seats (to fill grid)
+  '137','138','139','140','141','142','143','144','145','146','147','148'
+];
+
+/* ---------- mark 70% occupied ---------- */
+const totalSeats = seatOrder.length;
+const occupyCount = Math.ceil(totalSeats * 0.7); // 70%
+let occupiedSet = new Set();
+
+// shuffle and pick occupied
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+}
+let tmp = [...seatOrder];
+shuffle(tmp);
+for(let i=0;i<occupyCount;i++){
+  occupiedSet.add(tmp[i]);
+}
+
+/* ensure at least some laptop seats may be free for user to choose:
+   if all laptop seats occupied, free one randomly
+*/
+const laptopOccupied = [...laptopSeats].every(id => occupiedSet.has(id));
+if(laptopOccupied){
+  const idx = Math.floor(Math.random() * laptopSeats.length);
+  occupiedSet.delete(laptopSeats[idx]);
+}
+
+/* ---------- render map ---------- */
+const map = document.getElementById('map');
+map.innerHTML = '';
+seatOrder.forEach((id, index) => {
+  // create element
+  const seat = document.createElement('div');
+  seat.className = 'seat';
+  seat.dataset.id = id;
+  seat.innerText = id;
+
+  // mark laptop class
+  if(laptopSeats.includes(id)) seat.classList.add('laptop');
+
+  // mark occupied
+  if(occupiedSet.has(id)){
+    seat.classList.add('occupied');
+  } else {
+    // attach click handler
+    seat.addEventListener('click', ()=> selectSeat(id, seat));
+  }
+
+  map.appendChild(seat);
+});
+
+/* update occupied count */
+document.getElementById('occupiedCount').innerText = occupiedSet.size;
+
+/* ---------- selection and transition ---------- */
+let selectedSeatId = null;
+function selectSeat(id, el){
+  if(el.classList.contains('occupied')) return;
+  // remove previous selection class
+  document.querySelectorAll('.seat.selected').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSeatId = id;
+  document.getElementById('statusMsg').innerText = `你已選擇座位 ${id}`;
+  // delay 1 second then start quiz
+  setTimeout(()=>{
+    startQuiz();
+  }, 1000); // 1s as you specified
+}
+
+/* ---------- QUIZ: questions (NPC style) ---------- */
+/* We'll present a small sequence of NPC questions.
+   Each question must be answered correctly to proceed.
+*/
+
+const questions = [
+  {
+    id:1,
+    title: '問 1：座位取消規則',
+    body: '如果借位後長時間沒有使用，多久會自動取消？',
+    choices: [
+      {txt:'30 分鐘', ok:false},
+      {txt:'1 小時', ok:false},
+      {txt:'2 小時', ok:true},
+      {txt:'一天', ok:false}
+    ]
+  },
+  {
+    id:2,
+    title: '問 2：哪些座位有插座？',
+    body: '哪一組座位是「有插座」的筆電區？',
+    choices: [
+      {txt:'001–032', ok:false},
+      {txt:'050–080', ok:false},
+      {txt:'105–136', ok:true},
+      {txt:'200–230', ok:false}
+    ]
+  },
+  {
+    id:3,
+    title: '問 3：插座需求分配',
+    body: `若有學生需要充電（插座），應該將他安排到哪類座位？`,
+    choices:[
+      {txt:'一般座位', ok:false},
+      {txt:'筆電區（105–136）', ok:true},
+      {txt:'任何空位皆可', ok:false},
+      {txt:'走道旁', ok:false}
+    ]
+  }
+];
+
+let qIndex = 0;
+
+function startQuiz(){
+  // hide map/info, show quizArea
+  map.style.display = 'none';
+  document.querySelector('.info').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'block';
+  qIndex = 0;
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = questions[qIndex];
+  document.getElementById('qTitle').innerText = q.title;
+  document.getElementById('qBody').innerText = q.body;
+  const choices = document.getElementById('choices');
+  choices.innerHTML = '';
+  document.getElementById('qResult').innerText = '';
+  q.choices.forEach(c=>{
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.innerText = c.txt;
+    b.onclick = ()=> {
+      if(c.ok){
+        document.getElementById('qResult').innerText = '✅ 回答正確！';
+        qIndex++;
+        if(qIndex >= questions.length){
+          // pass
+          setTimeout(()=> showPass(), 700);
+        } else {
+          // next question after short delay
+          setTimeout(()=> renderQuestion(), 700);
+        }
+      } else {
+        document.getElementById('qResult').innerText = '❌ 回答不正確，請再試一次。';
+      }
+    };
+    choices.appendChild(b);
+  });
+}
+
+function showPass(){
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('passScreen').style.display = 'block';
+}
+
+/* ---------- end ---------- */
+</script>
 </body>
 </html>
