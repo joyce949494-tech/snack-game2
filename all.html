@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>六大任務挑戰</title>
+<title>圖書館闖關總挑戰</title>
 
 <style>
 body{
@@ -13,32 +13,25 @@ body{
   text-align:center;
 }
 
-h1{
-  margin-bottom:10px;
-}
-
-/* ===== 獎章區 ===== */
+/* ===== 獎章 ===== */
 #medalRow{
   display:flex;
   justify-content:center;
-  gap:10px;
+  gap:12px;
   margin:20px 0;
 }
 
-.medal{
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  background:#ccc;
-  opacity:0.4;
+.medal{width:48px;}
+.medal img{width:100%;}
+
+.medal.flash{
+  animation:pop .6s ease;
+}
+@keyframes pop{
+  50%{transform:scale(1.4);filter:drop-shadow(0 0 10px gold);}
 }
 
-.medal.active{
-  background:#ffd700;
-  opacity:1;
-}
-
-/* ===== 遊戲卡片 ===== */
+/* ===== 卡片 ===== */
 .gameGrid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
@@ -51,7 +44,7 @@ h1{
   background:white;
   border-radius:20px;
   padding:20px;
-  box-shadow:0 0 12px rgba(0,0,0,0.15);
+  box-shadow:0 0 12px rgba(0,0,0,.15);
 }
 
 .gameCard img{
@@ -59,126 +52,139 @@ h1{
   margin-bottom:10px;
 }
 
-.gameBtn{
-  display:block;
+button{
   width:100%;
-  margin:8px 0;
+  margin:6px 0;
   padding:10px;
-  font-size:16px;
   border:none;
   border-radius:10px;
+  font-size:16px;
   cursor:pointer;
 }
-
 .play{background:#4caf50;color:white;}
 .rule{background:#2196f3;color:white;}
+
+/* ===== 規則彈窗 ===== */
+#ruleMask{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+}
+
+#ruleBox{
+  background:white;
+  max-width:420px;
+  margin:15% auto;
+  padding:20px;
+  border-radius:15px;
+}
+
+/* ===== 通關畫面 ===== */
+#clearBox{
+  display:none;
+}
 </style>
 </head>
 
 <body>
 
 <h1>📚 圖書館闖關任務</h1>
-<p>完成六個任務，點亮六枚獎章！</p>
 
-<!-- ===== 獎章顯示 ===== -->
 <div id="medalRow">
-  <div class="medal" id="m0"></div>
-  <div class="medal" id="m1"></div>
-  <div class="medal" id="m2"></div>
-  <div class="medal" id="m3"></div>
-  <div class="medal" id="m4"></div>
-  <div class="medal" id="m5"></div>
+  <div class="medal"><img id="m0"></div>
+  <div class="medal"><img id="m1"></div>
+  <div class="medal"><img id="m2"></div>
+  <div class="medal"><img id="m3"></div>
+  <div class="medal"><img id="m4"></div>
+  <div class="medal"><img id="m5"></div>
 </div>
 
-<!-- ===== 遊戲卡片 ===== -->
-<div class="gameGrid">
+<!-- ===== 遊戲區 ===== -->
+<div id="gameArea" class="gameGrid"></div>
 
-  <!-- 遊戲 1 -->
-  <div class="gameCard">
-    <img src="https://i.imgur.com/3JMiwED.png">
-    <h3>電腦區任務</h3>
-    <button class="gameBtn play" onclick="goGame(0)">進入遊戲</button>
-    <button class="gameBtn rule" onclick="openRule()">使用規則</button>
+<!-- ===== 通關畫面 ===== -->
+<div id="clearBox">
+  <h2>🎉 恭喜完成所有挑戰！</h2>
+  <img src="https://i.imgur.com/3JMiwED.png" width="220">
+  <p>你已成為圖書館使用達人！</p>
+</div>
+
+<!-- ===== 規則彈窗 ===== -->
+<div id="ruleMask" onclick="closeRule()">
+  <div id="ruleBox" onclick="event.stopPropagation()">
+    <h3 id="ruleTitle"></h3>
+    <p id="ruleText"></p>
+    <button onclick="closeRule()">關閉</button>
   </div>
-
-  <!-- 遊戲 2 -->
-  <div class="gameCard">
-    <img src="https://i.imgur.com/3JMiwED.png">
-    <h3>自動借書機</h3>
-    <button class="gameBtn play" onclick="goGame(1)">進入遊戲</button>
-    <button class="gameBtn rule" onclick="openRule()">使用規則</button>
-  </div>
-
-  <!-- 遊戲 3 -->
-  <div class="gameCard">
-    <img src="https://i.imgur.com/3JMiwED.png">
-    <h3>館藏搜尋</h3>
-    <button class="gameBtn play" onclick="goGame(2)">進入遊戲</button>
-    <button class="gameBtn rule" onclick="openRule()">使用規則</button>
-  </div>
-
-  <!-- 遊戲 4 -->
-  <div class="gameCard">
-    <img src="https://i.imgur.com/3JMiwED.png">
-    <h3>輕食區挑戰</h3>
-    <button class="gameBtn play" onclick="goGame(3)">進入遊戲</button>
-    <button class="gameBtn rule" onclick="openRule()">使用規則</button>
-  </div>
-
-  <!-- 遊戲 5 -->
-  <div class="gameCard">
-    <img src="https://i.imgur.com/3JMiwED.png">
-    <h3>討論室任務</h3>
-    <button class="gameBtn play" onclick="goGame(4)">進入遊戲</button>
-    <button class="gameBtn rule" onclick="openRule()">使用規則</button>
-  </div>
-
-  <!-- 遊戲 6 -->
-  <div class="gameCard">
-    <img src="https://i.imgur.com/3JMiwED.png">
-    <h3>閱覽席問答</h3>
-    <button class="gameBtn play" onclick="goGame(5)">進入遊戲</button>
-    <button class="gameBtn rule" onclick="openRule()">使用規則</button>
-  </div>
-
 </div>
 
 <script>
-/* ===== 遊戲網址 ===== */
-const links = [
-  "computer.html",
-  "borrow.html",
-  "findbook.html",
-  "index.html",
-  "student.html",
-  "seat.html"
+/* ===== 圖片 ===== */
+const medalGray="https://i.imgur.com/8bJZKpJ.png";
+const medalGold="https://i.imgur.com/3JMiwED.png";
+
+/* ===== 遊戲資料 ===== */
+const games=[
+{title:"電腦區",img:"https://i.imgur.com/3JMiwED.png",
+ rule:"使用電腦需遵守時間與用途規範。",link:"computer5.html"},
+{title:"自動借書機",img:"https://i.imgur.com/3JMiwED.png",
+ rule:"借書前請確認書籍狀態並完成刷卡。",link:"borrow2.html"},
+{title:"館藏搜尋",img:"https://i.imgur.com/3JMiwED.png",
+ rule:"學會查詢書籍位置與索書號。",link:"findbook2.html"},
+{title:"輕食區",img:"https://i.imgur.com/3JMiwED.png",
+ rule:"僅可攜帶氣味低的輕食與飲料。",link:"index.html"},
+{title:"討論室",img:"https://i.imgur.com/3JMiwED.png",
+ rule:"依照人數與時間正確使用討論室。",link:"student2.html"},
+{title:"閱覽席",img:"https://i.imgur.com/3JMiwED.png",
+ rule:"離席記得登記，避免座位被取消。",link:"question.html"}
 ];
 
 /* ===== 初始化 ===== */
-if(!localStorage.getItem("medalList")){
-  localStorage.setItem("medalList",JSON.stringify([false,false,false,false,false,false]));
+if(!localStorage.medalList){
+ localStorage.medalList=JSON.stringify([false,false,false,false,false,false]);
 }
 
-function refreshMedals(){
-  let list = JSON.parse(localStorage.getItem("medalList"));
-  list.forEach((v,i)=>{
-    if(v){
-      document.getElementById("m"+i).classList.add("active");
-    }
-  });
+const list=JSON.parse(localStorage.medalList);
+
+/* ===== 獎章 ===== */
+list.forEach((v,i)=>{
+ document.getElementById("m"+i).src=v?medalGold:medalGray;
+});
+
+/* ===== 全通關 ===== */
+if(list.every(v=>v)){
+ document.getElementById("gameArea").style.display="none";
+ document.getElementById("clearBox").style.display="block";
 }
 
-/* ===== 進入遊戲 ===== */
+/* ===== 建立卡片 ===== */
+const area=document.getElementById("gameArea");
+games.forEach((g,i)=>{
+ const c=document.createElement("div");
+ c.className="gameCard";
+ c.innerHTML=`
+ <img src="${g.img}">
+ <h3>${g.title}</h3>
+ <button class="play" onclick="goGame(${i})">進入遊戲</button>
+ <button class="rule" onclick="openRule('${g.title}','${g.rule}')">使用規則</button>
+ `;
+ area.appendChild(c);
+});
+
 function goGame(i){
-  window.location.href = links[i];
+ location.href=games[i].link;
 }
 
-/* ===== 規則網站（之後你可換） ===== */
-function openRule(){
-  window.open("https://www.nlpi.edu.tw","_blank");
+/* ===== 規則 ===== */
+function openRule(t,txt){
+ document.getElementById("ruleTitle").innerText=t+" 使用規則";
+ document.getElementById("ruleText").innerText=txt;
+ document.getElementById("ruleMask").style.display="block";
 }
-
-refreshMedals();
+function closeRule(){
+ document.getElementById("ruleMask").style.display="none";
+}
 </script>
 
 </body>
