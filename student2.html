@@ -46,18 +46,18 @@ button {
        style="margin-top:20px; width:250px;">
 
   <script>
-  localStorage.setItem("game5_done", "yes");
+  sessionStorage.setItem("game5_done", "yes");
 
   setTimeout(() => {
     window.location.href = "https://joyce949494-tech.github.io/snack-game2/all.html";
   }, 2000);
 
-    let list = JSON.parse(localStorage.getItem("medalList")) || 
+    let list = JSON.parse(sessionStorage.getItem("medalList")) || 
            [false,false,false,false,false,false];
 
 list[4] = true; // ⭐ 第 5 關
 
-localStorage.setItem("medalList", JSON.stringify(list));
+sessionStorage.setItem("medalList", JSON.stringify(list));
 </script>
 
 
