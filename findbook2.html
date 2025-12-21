@@ -51,6 +51,14 @@ button {
   setTimeout(() => {
     window.location.href = "https://joyce949494-tech.github.io/snack-game2/all.html";
   }, 2000);
+
+let list = JSON.parse(localStorage.getItem("medalList")) || 
+           [false,false,false,false,false,false];
+
+list[2] = true; // ⭐ 第 3 關
+
+localStorage.setItem("medalList", JSON.stringify(list));
+  
 </script>
   
 </div>
