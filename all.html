@@ -144,11 +144,11 @@ const games=[
 ];
 
 /* ===== 初始化 ===== */
-if(!localStorage.medalList){
- localStorage.medalList=JSON.stringify([false,false,false,false,false,false]);
+if(!sessionStorage.medalList){
+ sessionStorage.medalList = JSON.stringify([false,false,false,false,false,false]);
 }
 
-const list=JSON.parse(localStorage.medalList);
+const list = JSON.parse(sessionStorage.medalList);
 
 /* ===== 獎章 ===== */
 list.forEach((v,i)=>{
