@@ -94,13 +94,14 @@ button{
 <p>完成一關就可以點亮一個獎章，快來收集!</p>
 
 <div id="medalRow">
-  <div class="medal"><img src="https://i.imgur.com/cM9iiRF.png"></div>
-  <div class="medal"><img src="https://i.imgur.com/cM9iiRF.png"></div>
-  <div class="medal"><img src="https://i.imgur.com/cM9iiRF.png"></div>
-  <div class="medal"><img src="https://i.imgur.com/cM9iiRF.png"></div>
-  <div class="medal"><img src="https://i.imgur.com/cM9iiRF.png"></div>
-  <div class="medal"><img src="https://i.imgur.com/cM9iiRF.png"></div>
+  <div class="medal"><img id="m0"></div>
+  <div class="medal"><img id="m1"></div>
+  <div class="medal"><img id="m2"></div>
+  <div class="medal"><img id="m3"></div>
+  <div class="medal"><img id="m4"></div>
+  <div class="medal"><img id="m5"></div>
 </div>
+
 
 <div id="gameArea" class="gameGrid"></div>
 
@@ -112,6 +113,25 @@ button{
     <button onclick="closeRule()">關閉</button>
   </div>
 </div>
+<script>
+/* ===== 獎章圖片 ===== */
+const medalGray = "https://i.imgur.com/cM9iiRF.png";
+const medalGold = "https://i.imgur.com/3JMiwED.png";
+
+/* ===== 初始化獎章狀態 ===== */
+if(!localStorage.medalList){
+  localStorage.medalList = JSON.stringify([false,false,false,false,false,false]);
+}
+
+const medalList = JSON.parse(localStorage.medalList);
+
+/* ===== 顯示獎章 ===== */
+medalList.forEach((done,i)=>{
+  const img = document.getElementById("m"+i);
+  if(img){
+    img.src = done ? medalGold : medalGray;
+  }
+});
 
 <script>
 /* ===== 遊戲資料（重點條列版） ===== */
