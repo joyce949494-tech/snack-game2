@@ -88,7 +88,11 @@ function loadQuestion() {
 
   if (qaIndex >= qaList.length) {
 
-  localStorage.setItem("game6_done", "yes");
+  let list = JSON.parse(localStorage.getItem("medalList")) || 
+             [false,false,false,false,false,false];
+
+  list[5] = true; // ⭐ 第 6 關（閱覽席）
+  localStorage.setItem("medalList", JSON.stringify(list));
 
   qaBox.innerHTML = `
     <h2>🎉 恭喜通過三樓閱覽席小測驗！</h2>
@@ -96,12 +100,13 @@ function loadQuestion() {
     <img src='https://i.imgur.com/3JMiwED.png' style='width:200px; margin-top:20px;'>
   `;
 
-  setTimeout(() => {
-    window.location.href = "https://joyce949494-tech.github.io/snack-game2/all.html";
-  }, 2000);
+  setTimeout(()=>{
+    window.location.href="https://joyce949494-tech.github.io/snack-game2/all.html";
+  },2000);
 
   return;
 }
+
 
 
   const q = qaList[qaIndex];
