@@ -87,32 +87,30 @@ function check(ans) {
 
  setTimeout(() => {
     i++;
-    if(i < foods.length) {
+    if (i < foods.length) {
       showFood();
     } else {
       localStorage.setItem("game4_done", "yes");
+
       document.getElementById("gameBox").innerHTML =
         "<h2>🎉 挑戰完成！</h2>" +
         "<p>你的得分：" + score + " / " + foods.length + "</p>" +
         "<p>你已通過輕食區試煉！</p>" +
         "<img src='https://i.imgur.com/3JMiwED.png' style='width:200px; margin-top:20px;'>";
 
-      // ⭐完成後 2 秒跳回主畫面
       setTimeout(() => {
-let list = JSON.parse(localStorage.getItem("medalList")) || 
-           [false,false,false,false,false,false];
+        let list = JSON.parse(localStorage.getItem("medalList")) ||
+                   [false,false,false,false,false,false];
 
-list[3] = true; // ⭐ 第 4 關（輕食區）
+        list[3] = true;
+        localStorage.setItem("medalList", JSON.stringify(list));
 
-localStorage.setItem("medalList", JSON.stringify(list));
-        
         window.location.href =
           "https://joyce949494-tech.github.io/snack-game2/all.html";
       }, 2000);
-
     }
-}, 1500);
-
+  }, 1500);
+}
 showFood();
 </script>
 
