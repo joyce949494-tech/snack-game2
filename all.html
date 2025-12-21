@@ -1,127 +1,78 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<title>六大學習遊戲平台</title>
+    <meta charset="UTF-8">
+    <title>六大遊戲挑戰</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
 
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    display: flex;
-    height: 100vh;
-    background: #f6f6f6;
-}
+        h1 {
+            margin-top: 30px;
+        }
 
-/* 左區塊：遊戲列表 */
-#left {
-    width: 65%;
-    display: flex;
-    flex-wrap: wrap;
-    padding: 30px;
-    gap: 25px;
-    justify-content: center;
-    align-content: center;
-}
+        #medalBox {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-size:20px;
+            background: #ffd700;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
 
-/* 遊戲按鈕 */
-.gameBtn {
-    width: 280px;
-    height: 120px;
-    background: white;
-    border-radius: 18px;
-    border: 3px solid #444;
-    cursor: pointer;
-    font-size: 28px;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: .2s;
-}
-.gameBtn:hover{
-    transform: scale(1.05);
-}
+        .gameArea {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
 
-/* 禁用按鈕 */
-.disabled{
-    opacity: 0.4;
-    pointer-events: none;
-}
+        button {
+            width: 220px;
+            height: 80px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 20px;
+            border: none;
+            background: #0099ff;
+            color: white;
+        }
 
-/* 右欄：獎章 */
-#right {
-    width: 35%;
-    background: #eaeaea;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#medalTitle{
-    font-size: 46px;
-    font-weight: bold;
-    margin-top: 15px;
-}
-
-#medalArea{
-    margin-top: 40px;
-    width: 80%;
-    display: grid;
-    grid-template-columns: repeat(3, 95px);
-    grid-gap: 25px;
-    justify-content: center;
-}
-
-.medalSlot{
-    width: 95px;
-    height: 95px;
-    border-radius: 100px;
-    background: #c1c1c1;
-    border: 5px solid #6e6e6e;
-}
-
-/* 已獲得獎章 */
-.hasMedal{
-    background: gold !important;
-}
-</style>
-
+        button:disabled {
+            background: gray;
+            cursor:not-allowed;
+        }
+    </style>
 </head>
+
 <body>
+    <div id="medalBox">獎章：<span id="medalCount">0</span>/6</div>
 
-<div id="left">
+    <h1>遊戲挑戰主頁</h1>
+    <p>完成六個遊戲就獲得六枚獎章！</p>
 
-    <div class="gameBtn" id="g1">遊戲1</div>
-    <div class="gameBtn" id="g2">遊戲2</div>
-    <div class="gameBtn" id="g3">遊戲3</div>
-    <div class="gameBtn" id="g4">遊戲4</div>
-    <div class="gameBtn" id="g5">遊戲5</div>
-    <div class="gameBtn" id="g6">遊戲6</div>
-
-</div>
-
-
-<div id="right">
-    <div id="medalTitle">🏅獎章</div>
-
-    <div id="medalArea">
-        <div class="medalSlot" id="m1"></div>
-        <div class="medalSlot" id="m2"></div>
-        <div class="medalSlot" id="m3"></div>
-        <div class="medalSlot" id="m4"></div>
-        <div class="medalSlot" id="m5"></div>
-        <div class="medalSlot" id="m6"></div>
+    <div class="gameArea">
+        <button id="game1">遊戲 1</button>
+        <button id="game2">遊戲 2</button>
+        <button id="game3">遊戲 3</button>
+        <button id="game4">遊戲 4</button>
+        <button id="game5">遊戲 5</button>
+        <button id="game6">遊戲 6</button>
     </div>
-</div>
-
-
 
 <script>
+let medalCount = 0;
+document.getElementById("medalCount").innerText = medalCount;
 
-// 6個遊戲網址
-const gameLinks = [
+// 遊戲網址庫
+const links = [
 "https://joyce949494-tech.github.io/snack-game2/computer.html",
 "https://joyce949494-tech.github.io/snack-game2/borrow.html",
 "https://joyce949494-tech.github.io/snack-game2/findbook.html",
@@ -130,51 +81,61 @@ const gameLinks = [
 "https://joyce949494-tech.github.io/snack-game2/seat.html"
 ];
 
-// 讀資料
-let played = JSON.parse(localStorage.getItem("playedGames") || "[]");
+// 讀取完成紀錄
+if (localStorage.getItem("medalList") === null) {
+    localStorage.setItem("medalList", JSON.stringify([false,false,false,false,false,false]));
+}
 
-// 顯示徽章
-updateMedals();
+function goGame(index) {
 
-// 設定按鈕事件
-for(let i=1;i<=6;i++){
-    let btn = document.querySelector("#g"+i);
+    let list = JSON.parse(localStorage.getItem("medalList"));
 
-    ////// 已玩過 → 按鈕關掉
-    if(played.includes(i)){
-        btn.classList.add("disabled");
+    // 防止重複遊玩
+    if (list[index]) {
+        alert("此遊戲已完成！");
+        return;
     }
 
-    ////// 沒玩過 → 點就直接跳遊戲
-    else{
-        btn.addEventListener("click", function(){
-            localStorage.setItem("currentPlay", i);
-            location.href = gameLinks[i-1];
-        });
-    }
+    // 新視窗打開遊戲
+    let win = window.open(links[index],"_self");
+
+    // 回到主畫面時執行 → 承認完成 + 獎章
+    window.addEventListener("focus",() => {
+
+        let listBack = JSON.parse(localStorage.getItem("medalList"));
+
+        // 如果還沒拿過獎章 → 拿
+        if (!listBack[index]) {
+
+            listBack[index] = true;
+            localStorage.setItem("medalList", JSON.stringify(listBack));
+
+            medalCount++;
+            document.getElementById("medalCount").innerText = medalCount;
+
+            document.getElementById("game"+(index+1)).disabled = true;
+        }
+
+    },{once:true});
+
 }
 
 
-// 回頁面後自動收集獎章
-(function checkFinish(){
-    let id = Number(localStorage.getItem("currentPlay"));
-    if(id && !played.includes(id)){
-        played.push(id);
-        localStorage.setItem("playedGames", JSON.stringify(played));
-        updateMedals();
+// 初始化按鈕
+let medalList = JSON.parse(localStorage.getItem("medalList"));
+medalCount = medalList.filter(v => v === true).length;
+document.getElementById("medalCount").innerText = medalCount;
+
+// 亮起按鈕
+for(let i=0;i<6;i++){
+    let btn = document.getElementById("game"+(i+1));
+    btn.onclick = () => goGame(i);
+
+    // 已完成 → 禁止
+    if(medalList[i]){
+        btn.disabled = true;
     }
-    localStorage.removeItem("currentPlay");
-})();
-
-
-// 更新畫面徽章 + 鎖按鈕
-function updateMedals(){
-    played.forEach(num=>{
-        document.querySelector("#m"+num).classList.add("hasMedal");
-        document.querySelector("#g"+num).classList.add("disabled");
-    });
 }
-
 </script>
 
 </body>
