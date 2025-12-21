@@ -99,6 +99,13 @@ function check(ans) {
 
       // ⭐完成後 2 秒跳回主畫面
       setTimeout(() => {
+let list = JSON.parse(localStorage.getItem("medalList")) || 
+           [false,false,false,false,false,false];
+
+list[3] = true; // ⭐ 第 4 關（輕食區）
+
+localStorage.setItem("medalList", JSON.stringify(list));
+        
         window.location.href =
           "https://joyce949494-tech.github.io/snack-game2/all.html";
       }, 2000);
