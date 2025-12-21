@@ -45,7 +45,7 @@ button {
        alt="任務完成圖片"
        style="margin-top:20px; width:250px;">
 <script>
-  localStorage.setItem("game2_done", "yes");
+  sessionStorage.setItem("game2_done", "yes");
 
   setTimeout(() => {
     window.location.href = "https://joyce949494-tech.github.io/snack-game2/all.html";
@@ -56,7 +56,7 @@ let list = JSON.parse(sessionStorage.getItem("medalList")) ||
 
 list[1] = true; // ⭐ 第 2 關（借書機）
 
-localStorage.setItem("medalList", JSON.stringify(list));
+sessionStorage.setItem("medalList", JSON.stringify(list));
   
 </script>
 
