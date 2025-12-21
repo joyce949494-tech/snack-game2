@@ -88,11 +88,11 @@ function loadQuestion() {
 
   if (qaIndex >= qaList.length) {
 
-  let list = JSON.parse(localStorage.getItem("medalList")) || 
+  let list = JSON.parse(sessionStorage.getItem("medalList")) || 
              [false,false,false,false,false,false];
 
   list[5] = true; // ⭐ 第 6 關（閱覽席）
-  localStorage.setItem("medalList", JSON.stringify(list));
+  sessionStorage.setItem("medalList", JSON.stringify(list));
 
   qaBox.innerHTML = `
     <h2>🎉 恭喜通過三樓閱覽席小測驗！</h2>
