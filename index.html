@@ -90,7 +90,7 @@ function check(ans) {
     if (i < foods.length) {
       showFood();
     } else {
-      localStorage.setItem("game4_done", "yes");
+      sessionStorage.setItem("game4_done", "yes");
 
       document.getElementById("gameBox").innerHTML =
         "<h2>🎉 挑戰完成！</h2>" +
