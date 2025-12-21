@@ -1,3 +1,4 @@
+我現在通關後，還是沒有讓獎章變色
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -20,23 +21,33 @@ body{
   gap:12px;
   margin:20px 0;
 }
+
 .medal{width:48px;}
 .medal img{width:100%;}
+
+.medal.flash{
+  animation:pop .6s ease;
+}
+@keyframes pop{
+  50%{transform:scale(1.4);filter:drop-shadow(0 0 10px gold);}
+}
 
 /* ===== 卡片 ===== */
 .gameGrid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:20px;
-  max-width:1000px;
+  max-width:900px;
   margin:auto;
 }
+
 .gameCard{
   background:white;
   border-radius:20px;
   padding:20px;
   box-shadow:0 0 12px rgba(0,0,0,.15);
 }
+
 .gameCard img{
   width:120px;
   margin-bottom:10px;
@@ -61,28 +72,18 @@ button{
   inset:0;
   background:rgba(0,0,0,.5);
 }
+
 #ruleBox{
   background:white;
-  max-width:450px;
-  margin:12% auto;
+  max-width:420px;
+  margin:15% auto;
   padding:20px;
   border-radius:15px;
-  text-align:left;
 }
-#ruleBox h3{
-  text-align:center;
-}
-#ruleBox ul{
-  padding-left:20px;
-  line-height:1.6;
-}
-#ruleBox a{
-  color:#1976d2;
-  text-decoration:none;
-  font-weight:bold;
-}
-#ruleBox a:hover{
-  text-decoration:underline;
+
+/* ===== 通關畫面 ===== */
+#clearBox{
+  display:none;
 }
 </style>
 </head>
@@ -90,8 +91,9 @@ button{
 <body>
 
 <h1>📚 臺科大圖書館闖關任務</h1>
-<p>以下是六個有關臺科大圖書館的小遊戲，閱讀一下使用規則後來挑戰看看!</p> 
-<p>完成一關就可以點亮一個獎章，快來收集!</p>
+<p>以下是六個有關臺科大圖書館的小遊戲，閱讀一下使用規則後來挑戰看看!</p>
+<p>完成一關就可以點亮一個獎章</p>
+
 
 <div id="medalRow">
   <div class="medal"><img id="m0"></div>
@@ -102,91 +104,87 @@ button{
   <div class="medal"><img id="m5"></div>
 </div>
 
-
+<!-- ===== 遊戲區 ===== -->
 <div id="gameArea" class="gameGrid"></div>
+
+<!-- ===== 通關畫面 ===== -->
+<div id="clearBox">
+  <h2>🎉 恭喜完成所有挑戰！</h2>
+  <img src="https://i.imgur.com/3JMiwED.png" width="220">
+  <p>你已成為圖書館使用達人！</p>
+</div>
 
 <!-- ===== 規則彈窗 ===== -->
 <div id="ruleMask" onclick="closeRule()">
   <div id="ruleBox" onclick="event.stopPropagation()">
     <h3 id="ruleTitle"></h3>
-    <div id="ruleText"></div>
+    <p id="ruleText"></p>
     <button onclick="closeRule()">關閉</button>
   </div>
 </div>
-<script>
-/* ===== 獎章圖片 ===== */
-const medalGray = "https://i.imgur.com/cM9iiRF.png";
-const medalGold = "https://i.imgur.com/3JMiwED.png";
-
-/* ===== 初始化獎章狀態 ===== */
-if(!localStorage.medalList){
-  localStorage.medalList = JSON.stringify([false,false,false,false,false,false]);
-}
-
-const medalList = JSON.parse(localStorage.medalList);
-
-/* ===== 顯示獎章 ===== */
-medalList.forEach((done,i)=>{
-  const img = document.getElementById("m"+i);
-  if(img){
-    img.src = done ? medalGold : medalGray;
-  }
-});
 
 <script>
-/* ===== 遊戲資料（重點條列版） ===== */
-const games=[
+/* ===== 圖片 ===== */
+const medalGray="https://i.imgur.com/cM9iiRF.png";
+const medalGold="https://i.imgur.com/3JMiwED.png";
+
+/* ===== 遊戲資料 ===== */
+const games = [
 {
   title:"資訊共享區",
   img:"https://i.imgur.com/7qLJt7R.png",
-  rule:[
+  rule: [
     "使用前需先在入口機台登記",
     "每次使用時間為 2 小時",
-    "禁止飲食與玩遊戲",
-    "禁止瀏覽色情或侵權網站"
+    "禁止飲食、玩遊戲",
+    "禁止瀏覽色情或侵權內容"
   ],
   linkText:"查看完整使用規定",
   linkUrl:"https://sms.lib.ntust.edu.tw/#/rules/2c9b806a81cd5fed0181cd62acda0004",
   link:"computer.html"
 },
+
 {
   title:"自動借書機",
   img:"https://i.imgur.com/kDckafT.png",
-  rule:[
+  rule: [
     "先感應學生證或教職員證",
-    "書背朝下放入凹槽",
+    "書本書背朝下放入凹槽",
     "完成借閱後再取書"
   ],
   linkText:"借閱冊數與期限說明",
   linkUrl:"https://library.ntust.edu.tw/p/412-1049-3506.php?Lang=zh-tw",
   link:"borrow.html"
 },
+
 {
   title:"館藏搜尋",
   img:"https://i.imgur.com/ncE5mhA.png",
-  rule:[
+  rule: [
     "點選「開啟館藏查詢」",
-    "輸入書名或作者",
+    "使用書名或作者查詢",
     "找出正確樓層"
   ],
   link:"findbook.html"
 },
+
 {
   title:"輕食區",
   img:"https://i.imgur.com/ydlKP3v.png",
-  rule:[
+  rule: [
     "僅可攜帶附蓋飲料",
     "可攜帶麵包、三明治、零食",
-    "禁止氣味明顯食物"
+    "禁止其他氣味明顯食物"
   ],
   linkText:"查看輕食區完整規定",
   linkUrl:"https://library.ntust.edu.tw/p/412-1049-6766.php?Lang=zh-tw",
   link:"index.html"
 },
+
 {
   title:"討論小間",
   img:"https://i.imgur.com/mfEGIKi.png",
-  rule:[
+  rule: [
     "3 人以上才可申請",
     "每間最多 6 人",
     "最多使用 2 小時",
@@ -196,13 +194,14 @@ const games=[
   linkUrl:"https://library.ntust.edu.tw/p/412-1049-6684.php?Lang=zh-tw",
   link:"student.html"
 },
+
 {
   title:"前棟 3F 閱覽席",
   img:"https://i.imgur.com/1Kj827y.png",
-  rule:[
+  rule: [
     "使用前需至機台登記",
     "靠牆與筆電區設有插座",
-    "離館超過 2 小時將取消座位"
+    "離館超過 2 小時座位會取消"
   ],
   linkText:"查看閱覽席完整規定",
   linkUrl:"https://sms.lib.ntust.edu.tw/#/rules/2c9b806a81cd5fed0181cd64f3510010",
@@ -210,37 +209,75 @@ const games=[
 }
 ];
 
-/* ===== 建立卡片 ===== */
-const area=document.getElementById("gameArea");
-games.forEach(g=>{
-  const c=document.createElement("div");
-  c.className="gameCard";
-  c.innerHTML=`
-    <img src="${g.img}">
-    <h3>${g.title}</h3>
-    <button class="play" onclick="location.href='${g.link}'">進入遊戲</button>
-    <button class="rule"
-      onclick='openRule("${g.title}",${JSON.stringify(g.rule)},"${g.linkText||""}","${g.linkUrl||""}")'>
-      使用規則
-    </button>
-  `;
-  area.appendChild(c);
+
+/* ===== 初始化 ===== */
+if(!sessionStorage.medalList){
+ sessionStorage.medalList = JSON.stringify([false,false,false,false,false,false]);
+}
+
+const list = JSON.parse(sessionStorage.medalList);
+
+/* ===== 獎章 ===== */
+list.forEach((v,i)=>{
+ document.getElementById("m"+i).src=v?medalGold:medalGray;
 });
 
-/* ===== 規則彈窗 ===== */
-function openRule(title,rules,linkText,linkUrl){
-  document.getElementById("ruleTitle").innerText=title+" 使用規則";
-  let html="<ul>";
-  rules.forEach(r=>html+=`<li>${r}</li>`);
-  html+="</ul>";
-  if(linkUrl){
-    html+=`<p>🔗 <a href="${linkUrl}" target="_blank">${linkText}</a></p>`;
-  }
-  document.getElementById("ruleText").innerHTML=html;
-  document.getElementById("ruleMask").style.display="block";
+/* ===== 全通關 ===== */
+if(list.every(v=>v)){
+ document.getElementById("gameArea").style.display="none";
+ document.getElementById("clearBox").style.display="block";
 }
+
+/* ===== 建立卡片 ===== */
+const area=document.getElementById("gameArea");
+games.forEach((g,i)=>{
+ const c=document.createElement("div");
+ c.className="gameCard";
+ c.innerHTML=`
+ <img src="${g.img}">
+ <h3>${g.title}</h3>
+ <button class="play" onclick="goGame(${i})">進入遊戲</button>
+ <button class="rule"
+ onclick="openRule(
+   '${g.title}',
+   ${JSON.stringify(g.rule)},
+   '${g.linkText || ""}',
+   '${g.linkUrl || ""}'
+ )">
+ 使用規則
+</button>
+
+ `;
+ area.appendChild(c);
+});
+
+function goGame(i){
+ location.href=games[i].link;
+}
+
+/* ===== 規則 ===== */
+function openRule(title, rules, linkText, linkUrl){
+  document.getElementById("ruleTitle").innerText = title + " 使用規則";
+
+  let html = "<ul style='text-align:left; line-height:1.6;'>";
+  rules.forEach(r=>{
+    html += `<li>${r}</li>`;
+  });
+  html += "</ul>";
+
+  if(linkUrl){
+    html += `
+      <p style="margin-top:12px;">
+        🔗 <a href="${linkUrl}" target="_blank">${linkText}</a>
+      </p>`;
+  }
+
+  document.getElementById("ruleText").innerHTML = html;
+  document.getElementById("ruleMask").style.display = "block";
+}
+
 function closeRule(){
-  document.getElementById("ruleMask").style.display="none";
+ document.getElementById("ruleMask").style.display="none";
 }
 </script>
 
