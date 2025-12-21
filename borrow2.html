@@ -51,7 +51,7 @@ button {
     window.location.href = "https://joyce949494-tech.github.io/snack-game2/all.html";
   }, 2000);
 
-let list = JSON.parse(localStorage.getItem("medalList")) || 
+let list = JSON.parse(sessionStorage.getItem("medalList")) || 
            [false,false,false,false,false,false];
 
 list[1] = true; // ⭐ 第 2 關（借書機）
