@@ -87,18 +87,22 @@ function loadQuestion() {
   const qaBox = document.getElementById("qaSection");
 
   if (qaIndex >= qaList.length) {
-    qaBox.innerHTML = `
-      <h2>🎉 恭喜通過三樓閱覽席小測驗！</h2>
-      <p>你已完全掌握三樓閱覽席的使用規則！</p>
-  <img src='https://i.imgur.com/3JMiwED.png' style='width:200px; margin-top:20px;'>
-    `;
-    
-setTimeout(()=>{
-        window.location.href = "https://joyce949494-tech.github.io/snack-game2/all.html";
-    }, 2000);
-    
-    return;
-  }
+
+  localStorage.setItem("game6_done", "yes");
+
+  qaBox.innerHTML = `
+    <h2>🎉 恭喜通過三樓閱覽席小測驗！</h2>
+    <p>你已完全掌握三樓閱覽席的使用規則！</p>
+    <img src='https://i.imgur.com/3JMiwED.png' style='width:200px; margin-top:20px;'>
+  `;
+
+  setTimeout(() => {
+    window.location.href = "https://joyce949494-tech.github.io/snack-game2/all.html";
+  }, 2000);
+
+  return;
+}
+
 
   const q = qaList[qaIndex];
   document.getElementById("qaQuestion").innerText = q.q;
