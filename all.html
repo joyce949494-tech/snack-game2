@@ -233,21 +233,20 @@ const area=document.getElementById("gameArea");
 games.forEach((g,i)=>{
  const c=document.createElement("div");
  c.className="gameCard";
- c.innerHTML=`
- <img src="${g.img}">
- <h3>${g.title}</h3>
- <button class="play" onclick="goGame(${i})">進入遊戲</button>
- <button class="rule"
- onclick="openRule(
-   '${g.title}',
-   ${JSON.stringify(g.rule)},
-   '${g.linkText || ""}',
-   '${g.linkUrl || ""}'
- )">
- 使用規則
-</button>
+ c.innerHTML = `
+  <img src="${g.img}">
+  <h3>${g.title}</h3>
+  <button class="play">進入遊戲</button>
+  <button class="rule">使用規則</button>
+`;
 
- `;
+c.querySelector(".play").addEventListener("click",()=>{
+  location.href = g.link;
+});
+
+c.querySelector(".rule").addEventListener("click",()=>{
+  openRule(g.title, g.rule, g.linkText || "", g.linkUrl || "");
+});
  area.appendChild(c);
 });
 
